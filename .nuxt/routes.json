@@ -3,28 +3,24 @@
     "name": "blog",
     "path": "/blog",
     "component": "/Users/yizhe/Developer/zhangyizhe.github.io/pages/blog/index.vue",
-    "chunkName": "pages/blog/index",
-    "_name": "_b7a6a5a8"
+    "chunkName": "pages/blog/index"
   },
   {
     "name": "projects",
     "path": "/projects",
     "component": "/Users/yizhe/Developer/zhangyizhe.github.io/pages/projects.vue",
-    "chunkName": "pages/projects",
-    "_name": "_41ada6c1"
+    "chunkName": "pages/projects"
   },
   {
     "name": "blog-slug",
     "path": "/blog/:slug",
     "component": "/Users/yizhe/Developer/zhangyizhe.github.io/pages/blog/_slug.vue",
-    "chunkName": "pages/blog/_slug",
-    "_name": "_bb13e838"
+    "chunkName": "pages/blog/_slug"
   },
   {
     "name": "index",
     "path": "/",
     "component": "/Users/yizhe/Developer/zhangyizhe.github.io/pages/index.vue",
-    "chunkName": "pages/index",
-    "_name": "_c2605fca"
+    "chunkName": "pages/index"
   }
 ]

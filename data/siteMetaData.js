@@ -15,7 +15,7 @@ const siteMetadata = {
   siteLogo: "../assets/author.png",
   image: "~/assets/author.png",
   socialBanner: "/static/images/twitter-card.png",
-  email: "elecoxy[at]gmail[dot]com",
+  email: "yizhezhang[at]hkbu.edu.hk",
   github: "https://github.com/zhangyizhe",
   githubUser: "ZhangYizhe",
   twitter: "https://twitter.com/NgaiZitCHEUNG",
