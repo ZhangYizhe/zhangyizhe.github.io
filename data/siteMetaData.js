@@ -7,7 +7,7 @@ const siteMetadata = {
   headerTitle: "Yizhe ZHANG",
   slogan: "Recommender Systems",
   description:
-    "Recommender systems, User experience design, Human-Computer Interaction, Software architecture",
+    "Conversation Recommender Systems, Human-Computer Interaction, and Software Engineering",
   language: "en-us",
   theme: "system", // system, dark or light
   siteUrl: "https://zhangyizhe.github.io",
