@@ -1,4 +1,14 @@
 const projectsData = [
+    {
+    title: "Wofoo Health",
+    description: `The Wofoo Health project aims to design and develop a health-tracking platform for elder people. They can utilize it to record their health status and get some feedback and related information by the Recommender Systems.`,
+    imgSrc: "",
+    href: "https://healthapi.elecoxy.com",
+    github: "#",
+    tech1: "Flutter",
+    tech2: "VUE.js",
+    tech3: "Django",
+  },
   {
     title: "Pistis Health",
     description: `Pistis contains a conversation recommender system. The chatbot has a set of dialogue flows. Users can be guided by it to complete a mental assessment. The result will be used to establish the user model and produce recommendations.`,
