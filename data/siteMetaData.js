@@ -10,7 +10,7 @@ const siteMetadata = {
     "Conversation Recommender Systems, Human-Computer Interaction, and Software Engineering",
   language: "en-us",
   theme: "system", // system, dark or light
-  siteUrl: "https://zhangyizhe.github.io",
+  siteUrl: "https://elecoxy.com",
   siteRepo: "#",
   siteLogo: "../assets/author.png",
   image: "~/assets/author.png",
