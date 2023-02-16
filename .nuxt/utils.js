@@ -57,7 +57,6 @@ export function getChildrenComponentInstancesUsingFetch(vm, instances = []) {
   for (const child of children) {
     if (child.$fetch) {
       instances.push(child)
-      continue; // Don't get the children since it will reload the template
     }
     if (child.$children) {
       getChildrenComponentInstancesUsingFetch(child, instances)
@@ -193,7 +192,7 @@ export async function setContext (app, context) {
   if (!app.context) {
     app.context = {
       isStatic: process.static,
-      isDev: false,
+      isDev: true,
       isHMR: false,
       app,
 
@@ -203,6 +202,13 @@ export async function setContext (app, context) {
       env: {}
     }
     // Only set once
+
+    if (context.req) {
+      app.context.req = context.req
+    }
+    if (context.res) {
+      app.context.res = context.res
+    }
 
     if (context.ssrContext) {
       app.context.ssrContext = context.ssrContext
@@ -239,8 +245,8 @@ export async function setContext (app, context) {
           })
         }
         if (process.client) {
-          // https://developer.mozilla.org/en-US/docs/Web/API/Location/replace
-          window.location.replace(path)
+          // https://developer.mozilla.org/en-US/docs/Web/API/Location/assign
+          window.location.assign(path)
 
           // Throw a redirect error
           throw new Error('ERR_REDIRECT')
@@ -249,6 +255,7 @@ export async function setContext (app, context) {
     }
     if (process.server) {
       app.context.beforeNuxtRender = fn => context.beforeRenderFns.push(fn)
+      app.context.beforeSerialize = fn => context.beforeSerializeFns.push(fn)
     }
     if (process.client) {
       app.context.nuxtState = window.__NUXT__
@@ -272,7 +279,7 @@ export async function setContext (app, context) {
   app.context.next = context.next
   app.context._redirected = false
   app.context._errored = false
-  app.context.isHMR = false
+  app.context.isHMR = Boolean(context.isHMR)
   app.context.params = app.context.route.params || {}
   app.context.query = app.context.route.query || {}
 }
@@ -290,6 +297,9 @@ export function middlewareSeries (promises, appContext) {
 export function promisify (fn, context) {
   let promise
   if (fn.length === 2) {
+      console.warn('Callback-based asyncData, fetch or middleware calls are deprecated. ' +
+        'Please switch to promises or async/await syntax')
+
     // fn(context, callback)
     promise = new Promise((resolve) => {
       fn(context, function (err, data) {

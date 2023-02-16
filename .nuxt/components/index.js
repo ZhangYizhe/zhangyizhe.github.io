@@ -1,11 +1,11 @@
-export const AuthorCard = () => import('../../components/AuthorCard.vue' /* webpackChunkName: "components/author-card" */).then(c => wrapFunctional(c.default || c))
-export const AuthorIntro = () => import('../../components/AuthorIntro.vue' /* webpackChunkName: "components/author-intro" */).then(c => wrapFunctional(c.default || c))
-export const Expertise = () => import('../../components/Expertise.vue' /* webpackChunkName: "components/expertise" */).then(c => wrapFunctional(c.default || c))
-export const ProjectCard = () => import('../../components/ProjectCard.vue' /* webpackChunkName: "components/project-card" */).then(c => wrapFunctional(c.default || c))
-export const TheFooter = () => import('../../components/TheFooter.vue' /* webpackChunkName: "components/the-footer" */).then(c => wrapFunctional(c.default || c))
-export const TheHeader = () => import('../../components/TheHeader.vue' /* webpackChunkName: "components/the-header" */).then(c => wrapFunctional(c.default || c))
-export const TimeLine = () => import('../../components/TimeLine.vue' /* webpackChunkName: "components/time-line" */).then(c => wrapFunctional(c.default || c))
-export const BlogItem = () => import('../../components/blogItem.vue' /* webpackChunkName: "components/blog-item" */).then(c => wrapFunctional(c.default || c))
+export { default as AuthorCard } from '../../components/AuthorCard.vue'
+export { default as AuthorIntro } from '../../components/AuthorIntro.vue'
+export { default as Expertise } from '../../components/Expertise.vue'
+export { default as ProjectCard } from '../../components/ProjectCard.vue'
+export { default as TheFooter } from '../../components/TheFooter.vue'
+export { default as TheHeader } from '../../components/TheHeader.vue'
+export { default as TimeLine } from '../../components/TimeLine.vue'
+export { default as BlogItem } from '../../components/blogItem.vue'
 
 // nuxt/nuxt.js#8607
 function wrapFunctional(options) {
