@@ -1,5 +1,5 @@
 <template>
-  <footer class="footer">
+  <footer class="footer" v-if="isDisplay">
     <div class="content has-text-centered">
       <p>
         <strong>Elecoxy.com</strong> Developed by <a href="https://elecoxy.com">YIZHE ZHANG</a>
@@ -9,8 +9,23 @@
 </template>
 
 <script>
+import {store} from "@/data/store";
+
 export default {
-  name: "FooterView"
+  name: "FooterView",
+  data() {
+    return {
+      store,
+    }
+  },
+  computed: {
+    isDisplay() {
+      if (store.tag === 'chat') {
+        return false
+      }
+      return true
+    }
+  }
 }
 </script>
 
