@@ -72,6 +72,7 @@
 <script>
 import axios from "axios";
 import {store} from "@/data/store";
+import {Base64} from "js-base64";
 
 export default {
   name: "ChatView",
@@ -91,6 +92,11 @@ export default {
         title: "",
         content: ""
       }
+    }
+  },
+  computed: {
+    token() {
+      return Base64.decode(store.token);
     }
   },
   mounted() {
@@ -138,7 +144,7 @@ export default {
       this.isLoading = true;
 
       const headers = {
-        'Authorization': 'Bearer ' + store.token
+        'Authorization': 'Bearer ' + this.token
       };
 
       axios.post('https://api.openai.com/v1/chat/completions', {
