@@ -75,7 +75,7 @@ export default {
       store,
 
       user: {
-        avatar: '/public/img/home/author.png',
+        avatar: '/img/home/author.png',
         name: 'Yizhe ZHANG',
         title: 'Research Assistant | HKBU',
         mail: 'yizhezhang[at]hkbu.edu.hk',
