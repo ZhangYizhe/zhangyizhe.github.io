@@ -4,10 +4,11 @@
       <nav class="navbar" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
           <a class="navbar-item" href="#">
-            <h1 class="title is-4">Elecoxy.com</h1>
+            <h1 class="title is-4">Yizhe ZHANG</h1>
           </a>
 
-          <a role="button" :class="['navbar-burger', isExpended ? 'is-active' : '']" aria-label="menu" aria-expanded="false" @click="isExpended = !isExpended">
+          <a role="button" :class="['navbar-burger', isExpended ? 'is-active' : '']" aria-label="menu"
+             aria-expanded="false" @click="isExpended = !isExpended">
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
@@ -19,8 +20,12 @@
             <router-link to="/" :class="['navbar-item', tag === 'home' ? 'is-active' : '']">
               Home
             </router-link>
+            <!--            <router-link to="/" :class="['navbar-item', tag === 'projects' ? 'is-active' : '']">-->
+            <!--              Projects-->
+            <!--            </router-link>-->
             <router-link to="/chat" :class="['navbar-item', tag === 'chat' ? 'is-active' : '']">
-              Chat
+              Chat<span
+                style="font-size: 10px; margin-left: 5px; padding: 2px 5px; background-color: green; color: white; border-radius: 5px">Beta</span>
             </router-link>
           </div>
         </div>
