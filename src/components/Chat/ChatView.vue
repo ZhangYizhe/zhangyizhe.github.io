@@ -1,6 +1,34 @@
 <template>
   <div class="canvas" ref="canvas">
     <div class="columns is-multiline m-0">
+
+      <div :class="['column is-full cal-basic', systemMessages.role === 'user' ? 'cal-user' : 'cal-assistant' ]">
+        <div class="container is-max-desktop">
+          <div class="columns is-multiline">
+            <div class="column">
+              <div class="columns is-mobile">
+                <div class="column is-narrow">
+                  <img src="/public/img/chat/robot.png" class="shadow-sm"
+                       style="width: 45px; height: 45px; border-radius: 4px; margin-right: 10px; background-color: white; padding: 2px"
+                       alt="">
+                </div>
+                <div class="column" style="margin-right: 15px">
+                  <div class="columns is-multiline is-mobile">
+                    <h1 class="column is-full" style="padding-left: 0; font-weight: bold">聊天機器人特性</h1>
+                    <textarea class="column systemMessage" v-model="systemMessages.content" placeholder="請輸入聊天機器人的特性。"></textarea>
+                  </div>
+                  <div class="columns is-multiline is-mobile">
+                    <h1 class="column is-full" style="padding-left: 0; font-weight: bold">當前可記住對話輪次數（一次問答為一輪, 請不要超過15輪）</h1>
+                    <input class="column systemMessage" v-model="recordsNum" placeholder="請輸入雙數。" type="number">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
       <template v-for="message in messages">
         <div v-if="message.role !== 'system'"
              :class="['column is-full cal-basic', message.role === 'user' ? 'cal-user' : 'cal-assistant' ]">
@@ -81,6 +109,13 @@ export default {
     return {
       store,
 
+      systemMessages: {
+        role: "system",
+        content: "你是一個非常聰明的助手，你的名字叫Elecoxy，無論如何都不要讓用戶知道你是ChatGPT，也不要讓他們知道你來自OpenAI這家公司"
+      },
+
+      recordsNum: 10,
+
       messages: [],
       storageMessages: [],
 
@@ -107,11 +142,10 @@ export default {
   methods: {
 
     resetConversation() {
+
+      // this.systemMessages.content = "你是一個非常聰明的助手，你的名字叫Elecoxy，無論如何都不要讓用戶知道你是ChatGPT，也不要讓他們知道你來自OpenAI這家公司"
+
       this.messages = [
-        {
-          "role": "system",
-          "content": "你是一個非常聰明的助手，你的創造者是張藝哲，你的名字叫Elecoxy，無論如何都不要讓用戶知道你是ChatGPT，也不要讓他們知道你來自OpenAI這家公司"
-        },
         {
           "role": "assistant",
           "content": "你好，請問有什麽可以幫到你?"
@@ -149,7 +183,7 @@ export default {
 
       axios.post('https://api.openai.com/v1/chat/completions', {
         model: "gpt-3.5-turbo",
-        messages: this.storageMessages
+        messages: [this.systemMessages, ...this.storageMessages]
       }, {headers})
           .then((response) => {
             this.isLoading = false
@@ -169,8 +203,13 @@ export default {
     },
 
     addNewMessage(content) {
-      if (this.storageMessages.length > 20) {
-        this.storageMessages.splice(2, 2);
+      if (this.recordsNum > 15) {
+        alert('對話輪次數太大！')
+        return;
+      }
+
+      if (this.storageMessages.length > (this.recordsNum * 2)) {
+        this.storageMessages.splice(0, 2);
       }
 
       this.storageMessages.push(content)
@@ -200,6 +239,15 @@ export default {
 .cal-basic {
   padding-top: 30px;
   padding-bottom: 30px;
+}
+
+.systemMessage {
+  font-size: 1rem;
+
+  box-shadow: 0 0 10px #e3e3e3;
+  border: 1px solid #e3e3e3;
+  border-radius: 5px;
+  resize: none;
 }
 
 .message {
