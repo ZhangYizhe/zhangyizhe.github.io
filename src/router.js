@@ -12,6 +12,12 @@ const routes = [
         name: 'chat',
         component: () => import('@/components/Chat/ChatView.vue'),
     },
+
+    {
+        path: '/grammar',
+        name: 'grammar',
+        component: () => import('@/components/Grammar/GrammarView.vue'),
+    },
 ]
 
 const router = createRouter({
