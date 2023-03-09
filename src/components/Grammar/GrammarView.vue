@@ -209,6 +209,7 @@ textarea {
 
 textarea:disabled {
   background-color: white;
+  color: black;
 }
 
 textarea:focus {
