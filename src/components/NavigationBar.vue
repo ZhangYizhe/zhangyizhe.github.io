@@ -27,6 +27,9 @@
               Chat<span
                 style="font-size: 10px; margin-left: 5px; padding: 2px 5px; background-color: green; color: white; border-radius: 5px">Beta</span>
             </router-link>
+            <router-link to="/grammar" :class="['navbar-item', tag === 'grammar' ? 'is-active' : '']">
+              Grammar
+            </router-link>
           </div>
         </div>
       </nav>
