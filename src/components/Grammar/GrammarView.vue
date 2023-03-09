@@ -207,6 +207,10 @@ textarea {
   line-height: 1.8rem;
 }
 
+textarea:disabled {
+  background-color: white;
+}
+
 textarea:focus {
   outline: none !important;
 }
