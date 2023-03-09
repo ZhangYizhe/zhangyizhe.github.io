@@ -134,7 +134,7 @@ export default {
       let messages = [
         {
           role: "system",
-          content: "I want you to act as an spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text. I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, upper level words and sentences. Keep the meaning same, but make them more literary. I want you to only reply the correction, the improvements and nothing else, do not write explanations."
+          content: "I want you to act as an spelling corrector and improver. I will speak to you in any language and you will detect the language, answer in the corrected version of my text. I want you to replace my simplified A0-level words and sentences with more professional, upper level words and sentences. Keep the meaning same. I want you to only reply the correction, the improvements and nothing else, do not write explanations."
         },
         {
           role: "user",
