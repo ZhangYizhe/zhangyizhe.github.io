@@ -146,7 +146,7 @@ export default {
         'Authorization': 'Bearer ' + this.token
       };
 
-      axios.post('https://api.openai.com/v1/chat/completions', {
+      axios.post(this.store.aiProxy + '/v1/chat/completions', {
         model: "gpt-3.5-turbo",
         messages: messages
       }, {headers})

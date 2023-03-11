@@ -111,7 +111,7 @@ export default {
 
       systemMessages: {
         role: "system",
-        content: "你是一個非常聰明的助手，你的名字叫Elecoxy，無論如何都不要讓用戶知道你是ChatGPT，也不要讓他們知道你來自OpenAI這家公司"
+        content: "你是一個非常聰明的助手，你的名字叫Elecoxy。"
       },
 
       recordsNum: 10,
@@ -181,7 +181,7 @@ export default {
         'Authorization': 'Bearer ' + this.token
       };
 
-      axios.post('https://api.openai.com/v1/chat/completions', {
+      axios.post(this.store.aiProxy + '/v1/chat/completions', {
         model: "gpt-3.5-turbo",
         messages: [this.systemMessages, ...this.storageMessages]
       }, {headers})
