@@ -1,7 +1,9 @@
 <template>
   <div style="background-color: #fafafa; padding-bottom: 35px">
     <div class="container p-3">
-      <button class="button is-link" style="font-size: 0.8rem; font-weight: bold"><i class="bi bi-spellcheck" style="margin-right: 5px; font-size: 1rem"></i>Grammar</button>
+      <button class="button is-link" style="font-size: 0.8rem; font-weight: bold"><i class="bi bi-spellcheck"
+                                                                                     style="margin-right: 5px; font-size: 1rem"></i>Grammar
+      </button>
     </div>
   </div>
   <div class="container canvas mb-5" style="margin-top: -30px; background-color: white">
@@ -16,19 +18,23 @@
             </div>
           </div>
           <div class="column is-full p-5" style="border-top: 1px solid #cbcbcb; border-right: 1px solid #cbcbcb">
-            <textarea @input="resizeTextarea" v-model="leftInput" placeholder="Input" ref="leftInputRef" :disabled="isLoading"></textarea>
+            <textarea @input="resizeTextarea" v-model="leftInput" placeholder="Input" ref="leftInputRef"
+                      :disabled="isLoading"></textarea>
           </div>
-          <div class="column is-full has-text-right" style="border-top: 1px solid #cbcbcb;border-bottom: 1px solid #cbcbcb; border-right: 1px solid #cbcbcb; margin-bottom: -1px">
-            <button class="button is-danger is-outlined" style="font-size: 0.8rem; font-weight: bold; margin-right: 10px" @click="cleanBtnTap">
+          <div class="column is-full has-text-right"
+               style="border-top: 1px solid #cbcbcb;border-bottom: 1px solid #cbcbcb; border-right: 1px solid #cbcbcb; margin-bottom: -1px">
+            <button class="button is-danger is-outlined"
+                    style="font-size: 0.8rem; font-weight: bold; margin-right: 10px" @click="cleanBtnTap">
               <i class="bi bi-trash3" style="margin-right: 5px; font-size: 1rem"></i>
               Clean
             </button>
-            <button class="button is-link is-outlined" style="font-size: 0.8rem; font-weight: bold;" :disabled="isLoading" @click="request">
+            <button class="button is-link is-outlined" style="font-size: 0.8rem; font-weight: bold;"
+                    :disabled="isLoading" @click="request">
               <template v-if="isLoading === false">
-                <i class="bi bi-spellcheck"  style="margin-right: 5px; font-size: 1rem"></i>
+                <i class="bi bi-spellcheck" style="margin-right: 5px; font-size: 1rem"></i>
               </template>
               <template v-else>
-                <div class="loader-wrapper is-active"  style="margin-right: 5px; font-size: 1rem; color: #485fc7">
+                <div class="loader-wrapper is-active" style="margin-right: 5px; font-size: 1rem; color: #485fc7">
                   <div class="loader is-loading"></div>
                 </div>
               </template>
@@ -49,8 +55,10 @@
           <div class="column is-full p-5" style="border-top: 1px solid #cbcbcb;">
             <textarea v-model="rightInput" placeholder="Output" ref="rightInputRef" disabled></textarea>
           </div>
-          <div class="column is-full has-text-right" style="border-top: 1px solid #cbcbcb;border-bottom: 1px solid #cbcbcb; border-right: 1px solid #cbcbcb; margin-bottom: -1px">
-            <button class="button is-link is-outlined" style="font-size: 0.8rem; font-weight: bold;" @click="copyBtnTap">
+          <div class="column is-full has-text-right"
+               style="border-top: 1px solid #cbcbcb;border-bottom: 1px solid #cbcbcb; border-right: 1px solid #cbcbcb; margin-bottom: -1px">
+            <button class="button is-link is-outlined" style="font-size: 0.8rem; font-weight: bold;"
+                    @click="copyBtnTap">
               <i class="bi bi-clipboard" style="margin-right: 5px; font-size: 1rem"></i>
               {{ copyBtnStr }}
             </button>
@@ -84,14 +92,14 @@ export default {
   watch: {
     leftInput() {
       const self = this
-      setTimeout(function(){
+      setTimeout(function () {
         self.resizeTextarea()
       }, 100);
     },
 
     rightInput() {
       const self = this
-      setTimeout(function(){
+      setTimeout(function () {
         self.resizeTextarea()
       }, 100);
     }
@@ -131,32 +139,22 @@ export default {
 
       this.isLoading = true;
 
-      let messages = [
-        {
-          role: "system",
-          content: "I want you to act as an spelling corrector and improver. I will speak to you in any language and you will detect the language, answer in the corrected version of my text. I want you to replace my simplified A0-level words and sentences with more professional, upper level words and sentences. Keep the meaning same. I want you to only reply the correction, the improvements and nothing else, do not write explanations."
-        },
-        {
-          role: "user",
-          content: "My text is '" + this.leftInput + "'"
-        }
-      ]
+      let prompt = "I want you to act as an spelling corrector and improver. I will speak to you in any language and you will detect the language, answer in the corrected version of my text. I want you to replace my simplified A0-level words and sentences with more professional, upper level words and sentences. Keep the meaning same. The content is:\\n\\n" + this.leftInput;
 
       const headers = {
         'Authorization': 'Bearer ' + this.token
       };
 
-      axios.post(this.store.aiProxy + '/v1/chat/completions', {
-        model: "gpt-3.5-turbo",
-        messages: messages
+      axios.post(this.store.aiProxy + '/v1/completions', {
+        model: "text-davinci-003",
+        temperature: 0.2,
+        max_tokens: 3900,
+        prompt: prompt
       }, {headers})
           .then((response) => {
             this.isLoading = false
 
-            const content = response.data['choices'][0]['message']['content'];
-            // const reg = /^['|"](.*)['|"]$/;
-
-            this.rightInput = content
+            this.rightInput = response.data['choices'][0]['text'].trim();
           })
           .catch((error) => {
             this.isLoading = false
@@ -182,7 +180,7 @@ export default {
       this.copyBtnStr = "Success";
 
       const self = this
-      setTimeout(function(){
+      setTimeout(function () {
         self.copyBtnStr = "Copy";
       }, 400);
 
@@ -222,6 +220,7 @@ textarea:focus {
   opacity: 0;
   transition: opacity 0.3s;
   display: flex;
+
   .loader {
     height: 1rem;
     width: 1rem;
