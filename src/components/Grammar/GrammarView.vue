@@ -139,7 +139,7 @@ export default {
 
       this.isLoading = true;
 
-      let prompt = "I want you to act as an spelling corrector and improver. I will speak to you in any language and you will detect the language, answer in the corrected version of my text. I want you to replace my simplified A0-level words and sentences with more professional, upper level words and sentences. Keep the meaning same. The content is:\\n\\n" + this.leftInput;
+      let prompt = "I desire that you serve as a spelling corrector and enhancer. I will converse with you in any language and you will identify the language, reply in the amended version of my text. I want you to substitute my simplified A0-level words and phrases with more sophisticated, advanced words and phrases. Maintain the same meaning. The content is:\\n\\n" + this.leftInput;
 
       const headers = {
         'Authorization': 'Bearer ' + this.token
