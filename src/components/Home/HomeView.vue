@@ -47,9 +47,9 @@
                       </p>
                     </div>
                     <div class="column">
-                      <p style="font-weight: bold; font-size: 1.2rem">{{item.title}}</p>
-                      <p style="color: gray">{{item.timeline}}</p>
-                      <p style="font-size: 1rem; color: #3f3f3f">{{item.description}}</p>
+                      <p style="font-weight: bold; font-size: 1.2rem; margin-bottom: 5px">{{item.title}}</p>
+                      <span :class="[item.isActive === true ? 'currentP' : '']" style="color: gray">{{item.timeline}}</span>
+                      <p style="font-size: 1rem; color: #3f3f3f;  margin-top: 5px">{{item.description}}</p>
                     </div>
                   </div>
                   <div style="position: absolute; width: 1px; margin-left: 0.5rem; top:0; z-index: -1; height: 100%; background-color: #c0c0c0">
@@ -99,7 +99,7 @@ export default {
         timeline: [
           {
             title: 'Research Assistant at HKBU',
-            isActive: false,
+            isActive: true,
             timeline: '2022 - Currently',
             description: 'Recommender Systems.',
           },
@@ -138,5 +138,11 @@ export default {
 </script>
 
 <style scoped>
-
+.currentP {
+  background-color: green;
+  padding: 4px 6px 4px 6px;
+  color: white !important;
+  border-radius: 5px;
+  font-size: 0.8rem;
+}
 </style>
