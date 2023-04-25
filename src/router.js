@@ -18,6 +18,14 @@ const routes = [
         name: 'grammar',
         component: () => import('@/components/Grammar/GrammarView.vue'),
     },
+
+    {
+        path: '/imageai',
+        name: 'imageai',
+        component: () => import('@/components/ImageAI/ImageAIView.vue'),
+    },
+
+
 ]
 
 const router = createRouter({

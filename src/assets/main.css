@@ -4,6 +4,10 @@
     color: #485fc7;
 }
 
+a.navbar-item.is-active {
+    color: #485fc7;
+}
+
 
 /*#app {*/
 /*  max-width: 1280px;*/
