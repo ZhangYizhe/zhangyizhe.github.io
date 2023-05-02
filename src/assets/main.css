@@ -1,4 +1,6 @@
-@import './base.css';
+/*@import './base.css';*/
+
+@import 'github-markdown-css/github-markdown.css';
 
 .main-color {
     color: #485fc7;

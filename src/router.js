@@ -25,6 +25,12 @@ const routes = [
         component: () => import('@/components/ImageAI/ImageAIView.vue'),
     },
 
+    {
+        path: '/privacy-policy',
+        name: 'privacy-policy',
+        component: () => import('@/components/PrivacyPolicy/PrivacyPolicyView.vue'),
+    },
+
 
 ]
 
