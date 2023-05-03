@@ -2,7 +2,7 @@
     <div style="background-color: #fafafa; padding-bottom: 35px">
         <div class="container p-3">
             <button class="button is-link" style="font-size: 0.8rem; font-weight: bold"><i class="bi bi-spellcheck"
-                                                                                           style="margin-right: 5px; font-size: 1rem"></i>Grammar
+                                                                                           style="margin-right: 5px; font-size: 1rem"></i>Grammar ( {{grammarVersion}} )
             </button>
         </div>
     </div>
@@ -83,6 +83,8 @@ export default {
         return {
             store,
 
+            grammarVersion: '1.1.0',
+
             leftInput: '',
             rightInput: '',
 
@@ -141,22 +143,36 @@ export default {
 
             this.isLoading = true;
 
-            let prompt = "I desire that you serve as a spelling corrector and enhancer. I will converse with you in any language and you will identify the language, reply in the amended version of my text. I want you to substitute my simplified A0-level words and phrases with more sophisticated, advanced words and phrases. Maintain the same meaning. The content is:\\n\\n" + this.leftInput;
+            let prompt = "Proofread and correct the below text and rewrite " +
+                "the corrected version, the text was delimited with " +
+                "triple backticks. If you don't find any errors, " +
+                "just response the original text. You only response " +
+                "the correct result without any other description. " +
+                "\n" +
+                "After reply the result, check the content by the below steps:\n" +
+                "Step-1: Don't use any punctuation around the text.\n" +
+                "Step-2: Don't use conversation tune to response." +
+                "\n" +
+                "Text: ```" + this.leftInput + "```"
 
             const headers = {
                 'Authorization': 'Bearer ' + this.token
             };
 
-            axios.post(this.store.aiProxy + '/v1/completions', {
-                model: "text-davinci-003",
-                temperature: 0.2,
-                max_tokens: 4097 - this.wordCount(prompt) - 100,
-                prompt: prompt
+            axios.post(this.store.aiProxy + '/v1/chat/completions', {
+                model: "gpt-3.5-turbo",
+                temperature: 0,
+                messages: [
+                    {
+                        "role": "user",
+                        "content": prompt,
+                    }
+                ]
             }, {headers})
                 .then((response) => {
                     this.isLoading = false
 
-                    this.rightInput = response.data['choices'][0]['text'].trim();
+                    this.rightInput = response.data['choices'][0]['message']["content"];
                 })
                 .catch((error) => {
                     this.isLoading = false
