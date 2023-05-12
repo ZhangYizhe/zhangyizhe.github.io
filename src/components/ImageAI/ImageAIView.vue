@@ -42,7 +42,7 @@ export default {
     },
     computed: {
         token() {
-            return Base64.decode(store.chatToken);
+            return Base64.decode(store.imageToken);
         }
     },
     mounted() {
