@@ -150,7 +150,7 @@ export default {
                 "the correct result without any other description. " +
                 "\n" +
                 "After reply the result, check the content by the below steps:\n" +
-                "Step-1: Don't use any punctuation around the text.\n" +
+                "Step-1: Don't use triple backticks around the text.\n" +
                 "Step-2: Don't use conversation tune to response." +
                 "\n" +
                 "Text: ```" + this.leftInput + "```"
