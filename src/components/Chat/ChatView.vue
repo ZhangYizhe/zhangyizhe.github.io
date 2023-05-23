@@ -80,14 +80,12 @@
   <div :class="['inputView', isLoading ? 'inputView-disabled' : '']">
     <div class="columns is-gapless is-mobile">
       <div class="column">
-        <input type="text" v-model="inputText" v-on:keyup.enter="sendBtnTap" :disabled="isLoading"
-               placeholder="說點什麼吧">
+        <textarea v-model="inputText" placeholder="說點什麼吧" ref="inputRef"
+                  :disabled="isLoading"></textarea>
       </div>
-      <div class="column is-narrow" style="margin: 0 5px 0 10px">
+      <div class="column is-narrow" style="margin: 0 0 0 5px">
         <button type="button" class="button" @click="sendBtnTap" :disabled="isLoading"><i class="bi bi-send"></i>
         </button>
-      </div>
-      <div class="column is-narrow" style="margin: 0 10px 0 5px">
         <button type="button" class="button" @click="resetConversation" :disabled="isLoading"><i
             class="bi bi-arrow-clockwise"></i>
         </button>
@@ -139,7 +137,27 @@ export default {
 
     this.resetConversation();
   },
+  watch: {
+    inputText() {
+      const self = this
+      setTimeout(function () {
+        self.resizeTextarea()
+      }, 10);
+    },
+  },
   methods: {
+
+    resizeTextarea() {
+      this.$refs.inputRef.style.height = 0 + 'px';
+
+      var inputHeight = this.$refs.inputRef.scrollHeight;
+
+      if (inputHeight > 300) {
+        inputHeight = 300;
+      }
+
+      this.$refs.inputRef.style.height = inputHeight + 'px';
+    },
 
     resetConversation() {
 
@@ -155,6 +173,7 @@ export default {
       this.storageMessages = JSON.parse(JSON.stringify(this.messages))
 
       this.inputText = ''
+      this.resizeTextarea()
     },
 
     sendBtnTap(e) {
@@ -203,7 +222,7 @@ export default {
     },
 
     addNewMessage(content) {
-      if (this.recordsNum > 15) {
+      if (this.recordsNum > 50) {
         alert('對話輪次數太大！')
         return;
       }
@@ -267,27 +286,46 @@ export default {
   border-bottom: 1px solid #e3e3e3;
 }
 
+textarea {
+  border: none;
+  resize: none;
+  width: 100%;
+  min-height: 1.3rem;
+  font-size: 1.1rem;
+  line-height: 1.5rem;
+}
+
 .inputView {
   position: fixed;
   box-shadow: 0 0 10px #e3e3e3;
   border: 1px solid #e3e3e3;
   border-radius: 5px;
-  width: 80%;
   overflow: hidden;
   background-color: white;
 
-  left: 10%;
   bottom: 40px;
   //margin-bottom: 40px;
 }
 
-.inputView input {
-  height: 100%;
-  width: 100%;
-  padding: 20px 0 20px 25px;
+@media(max-width:960px) {
+  .inputView{
+    width: 95vw;
+    left: 2.5vw;
+  }
+}
+
+@media(min-width:960px) {
+  .inputView{
+    width: 70vw;
+    left: 15vw;
+  }
+}
+
+.inputView textarea {
+  margin-top: 6px;
+  padding: 20px 0 20px 20px;
   border: none;
   background-color: transparent;
-  font-size: 18px;
 }
 
 .inputView-disabled {
