@@ -83,7 +83,7 @@ export default {
         return {
             store,
 
-            grammarVersion: '1.1.0',
+            grammarVersion: '1.2.0',
 
             leftInput: '',
             rightInput: '',
