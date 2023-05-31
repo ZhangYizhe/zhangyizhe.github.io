@@ -62,10 +62,12 @@
                        style="width: 45px; height: 45px; border-radius: 4px; margin-right: 10px; background-color: white; padding: 2px"
                        alt="">
                 </div>
-                <div class="column message">
-                  <div class="loader-wrapper is-active">
-                    <div class="loader is-loading"></div>&nbsp;&nbsp;請讓我想一想...
-                  </div>
+                <div class="column message cursor-animation">
+                  <span v-html="tempMessage">
+
+                  </span>
+                  <span class='blinking-cursor'>▋</span>
+
                 </div>
               </div>
             </div>
@@ -80,7 +82,7 @@
   <div :class="['inputView', isLoading ? 'inputView-disabled' : '']">
     <div class="columns is-gapless is-mobile">
       <div class="column">
-        <textarea v-model="inputText" placeholder="說點什麼吧" ref="inputRef"
+        <textarea v-model="inputText" placeholder="說點什麼吧" ref="inputRef" @keyup.enter.exact="sendBtnTap"
                   :disabled="isLoading"></textarea>
       </div>
       <div class="column is-narrow" style="margin: 0 0 0 5px">
@@ -99,6 +101,7 @@
 import axios from "axios";
 import {store} from "@/data/store";
 import {Base64} from "js-base64";
+import { fetchEventSource } from "@microsoft/fetch-event-source"
 
 export default {
   name: "ChatView",
@@ -109,11 +112,12 @@ export default {
 
       systemMessages: {
         role: "system",
-        content: "你是一個非常聰明的助手，你的名字叫Elecoxy。"
+        content: "你是一個非常聰明的助手，你的名字叫Elecoxy。",
       },
 
       recordsNum: 10,
 
+      tempMessage: "",
       messages: [],
       storageMessages: [],
 
@@ -161,12 +165,10 @@ export default {
 
     resetConversation() {
 
-      // this.systemMessages.content = "你是一個非常聰明的助手，你的名字叫Elecoxy，無論如何都不要讓用戶知道你是ChatGPT，也不要讓他們知道你來自OpenAI這家公司"
-
       this.messages = [
         {
           "role": "assistant",
-          "content": "你好，請問有什麽可以幫到你?"
+          "content": "你好，請問有什麽可以幫到你?",
         }
       ]
 
@@ -177,48 +179,87 @@ export default {
     },
 
     sendBtnTap(e) {
-      if (this.inputText === '') {
+      const textTrim = this.inputText.trim();
+
+      if (textTrim === '') {
         return;
       }
 
       this.addNewMessage({
         "role": "user",
-        "content": this.inputText
+        "content": textTrim
       })
 
       this.scrollToBottom();
 
-      this.inputText = ""
+      this.inputText = "";
 
       this.request();
     },
 
-    request() {
+    async request() {
       this.isLoading = true;
+      const subThis = this;
 
-      const headers = {
-        'Authorization': 'Bearer ' + this.token
-      };
+      await fetchEventSource(this.store.aiProxy + '/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.token
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [this.systemMessages, ...this.storageMessages],
+          stream: true,
+        }),
+        async onopen(response) {
+          if (response.ok) {
+            subThis.tempMessage = "";
+          } else if (response.status >= 400 && response.status < 500) {
+            alert(`Error Code: ${response.status}, please try again later.`);
+          } else {
+            alert("Undefined error");
+          }
+        },
+        onmessage(msg) {
+          if (msg.data === '[DONE]') {
+            subThis.isLoading = false;
+            return;
+          }
+          const msgData = JSON.parse(msg.data)
 
-      axios.post(this.store.aiProxy + '/v1/chat/completions', {
-        model: "gpt-3.5-turbo",
-        messages: [this.systemMessages, ...this.storageMessages]
-      }, {headers})
-          .then((response) => {
-            this.isLoading = false
-            this.addNewMessage(response.data['choices'][0]['message'])
-            this.scrollToBottom();
-          })
-          .catch((error) => {
-            this.isLoading = false
+          const delta = msgData['choices'][0]['delta']
+          const finish_reason = msgData['choices'][0]['finish_reason']
 
-            try {
-              const detail = error.response.data['error']['message']
-              alert(detail);
-            } catch (error) {
-              alert(error);
+          if (finish_reason === 'stop') {
+            const stopMessage = {
+              "role": "assistant",
+              "content": subThis.tempMessage
             }
-          });
+
+            subThis.isLoading = false;
+            subThis.tempMessage = "";
+
+            subThis.messages.push(stopMessage);
+            subThis.storageMessages.push(stopMessage);
+            return;
+          }
+
+          if (delta['content'] !== undefined) {
+            subThis.tempMessage += delta["content"];
+            subThis.scrollToBottomWithoutTimer();
+          }
+        },
+        onclose() {
+
+        },
+        onerror(err) {
+
+        }
+      })
+
+      this.isLoading = false;
+
     },
 
     addNewMessage(content) {
@@ -242,6 +283,11 @@ export default {
         const el = self.$refs.canvas;
         el.scrollTop = el.scrollHeight;
       }, 100)
+    },
+
+    scrollToBottomWithoutTimer() {
+      const el = this.$refs.canvas;
+      el.scrollTop = el.scrollHeight;
     },
 
 
@@ -349,38 +395,26 @@ textarea {
   outline: none;
 }
 
-.loader-wrapper {
-  text-align: center;
-  //position: absolute;
-  //top: 0;
-  //left: 0;
-  //height: 100%;
-  //width: 100%;
-  background: transparent;
-  opacity: 0;
-  //z-index: -1;
-  transition: opacity 0.3s;
-  display: flex;
-  //justify-content: center;
-  //align-items: center;
-  //border-radius: 6px;
-  .loader {
-    height: 1rem;
-    width: 1rem;
-  }
-
-  &.is-active {
-    opacity: 1;
-    //z-index: 1;
-  }
-}
-
 .is-loading {
   border: 2px solid black;
   border-right-color: transparent;
   border-top-color: transparent;
   margin-top: auto;
   margin-bottom: auto;
+}
+
+.blinking-cursor {
+  color: black;
+  animation: cursor-blink 1s step-end infinite;
+}
+
+@keyframes cursor-blink {
+  from, to {
+    color: transparent;
+  }
+  50% {
+    color: black;
+  }
 }
 
 </style>
