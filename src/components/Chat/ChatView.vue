@@ -18,7 +18,7 @@
                     <textarea class="column systemMessage" v-model="systemMessages.content" placeholder="請輸入聊天機器人的特性。"></textarea>
                   </div>
                   <div class="columns is-multiline is-mobile">
-                    <h1 class="column is-full" style="padding-left: 0; font-weight: bold">當前可記住對話輪次數（一次問答為一輪, 請不要超過15輪）</h1>
+                    <h1 class="column is-full" style="padding-left: 0; font-weight: bold">當前可記住對話輪次數（一次問答為一輪, 請不要超過50輪）</h1>
                     <input class="column systemMessage" v-model="recordsNum" placeholder="請輸入雙數。" type="number">
                   </div>
                 </div>
@@ -62,7 +62,7 @@
                        style="width: 45px; height: 45px; border-radius: 4px; margin-right: 10px; background-color: white; padding: 2px"
                        alt="">
                 </div>
-                <div class="column message cursor-animation">
+                <div class="column message">
                   <span v-html="tempMessage">
 
                   </span>
@@ -115,7 +115,7 @@ export default {
         content: "你是一個非常聰明的助手，你的名字叫Elecoxy。",
       },
 
-      recordsNum: 10,
+      recordsNum: 20,
 
       tempMessage: "",
       messages: [],
@@ -215,10 +215,22 @@ export default {
         async onopen(response) {
           if (response.ok) {
             subThis.tempMessage = "";
-          } else if (response.status >= 400 && response.status < 500) {
-            alert(`Error Code: ${response.status}, please try again later.`);
-          } else {
-            alert("Undefined error");
+            return;
+          }
+
+          switch (response.status) {
+            case 401 :
+              alert(`Error Code: ${response.status}, invalid Authentication, please try again later.`);
+              break;
+            case 429 :
+              alert(`Error Code: ${response.status}, rate limit reached for requests, please try again later.`);
+              break;
+            case 500 :
+              alert(`Error Code: ${response.status}, the server had an error while processing your request, please try again later.`);
+              break;
+            default:
+              alert(`Error Code: ${response.status}, please try again later.`);
+              break;
           }
         },
         onmessage(msg) {
