@@ -55,15 +55,20 @@
                         </div>
                     </div>
                     <div class="column is-full p-5" style="border-top: 1px solid #cbcbcb;">
-                        <textarea v-model="rightInput" placeholder="Output" ref="rightInputRef" disabled></textarea>
+                        <textarea v-model="rightInput" placeholder="Output" ref="rightInputRef"></textarea>
                     </div>
                     <div class="column is-full has-text-right"
                          style="border-top: 1px solid #cbcbcb;border-bottom: 1px solid #cbcbcb; border-right: 1px solid #cbcbcb; margin-bottom: -1px">
-                        <button class="button is-link is-outlined" style="font-size: 0.8rem; font-weight: bold;"
-                                @click="copyBtnTap">
-                            <i class="bi bi-clipboard" style="margin-right: 5px; font-size: 1rem"></i>
-                            {{ copyBtnStr }}
+                        <button class="button is-link is-outlined mr-2" style="font-size: 0.8rem; font-weight: bold;"
+                                @click="translateBtnTap">
+                            <i class="bi bi-translate" style="margin-right: 5px; font-size: 1rem"></i>
+                            Google translate
                         </button>
+                      <button class="button is-link is-outlined" style="font-size: 0.8rem; font-weight: bold;"
+                              @click="copyBtnTap">
+                        <i class="bi bi-clipboard" style="margin-right: 5px; font-size: 1rem"></i>
+                        {{ copyBtnStr }}
+                      </button>
                     </div>
                 </div>
             </div>
@@ -83,7 +88,7 @@ export default {
         return {
             store,
 
-            grammarVersion: '1.2.0',
+            grammarVersion: '1.3.0',
 
             leftInput: '',
             rightInput: '',
@@ -206,6 +211,13 @@ export default {
                 self.copyBtnStr = "Copy";
             }, 400);
 
+        },
+
+        translateBtnTap() {
+          if (this.rightInput.trim() === "") {
+            return;
+          }
+          window.open("https://translate.google.com.hk/?sl=auto&tl=zh-TW&text=" + this.rightInput + "&op=translate", "_blank")
         }
     }
 }
