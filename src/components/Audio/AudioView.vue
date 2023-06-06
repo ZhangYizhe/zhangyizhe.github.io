@@ -28,7 +28,18 @@
 import axios from "axios";
 import {Base64} from "js-base64";
 import {store} from "@/data/store";
-import {ref} from "vue";
+
+var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+// If you already load encoderWorker.js using <script> tag,
+// you don't need to define encoderWorkerFactory.
+const workerOptions = {
+  OggOpusEncoderWasmPath: 'https://cdn.jsdelivr.net/npm/opus-media-recorder@latest/OggOpusEncoder.wasm',
+  WebMOpusEncoderWasmPath: 'https://cdn.jsdelivr.net/npm/opus-media-recorder@latest/WebMOpusEncoder.wasm'
+};
+
+// Replace MediaRecorder
+window.MediaRecorder = OpusMediaRecorder;
 
 export default {
   name: "AudioView",
@@ -66,24 +77,19 @@ export default {
       navigator.mediaDevices.getUserMedia( { audio: true })
           .then(function (mediaStreamObj) {
 
+            const mimetype = isSafari ? 'audio/wav' : 'audio/webm';
+
+            let options = { mimeType: mimetype };
+
             that.mediaStreamObj = mediaStreamObj;
-            that.mediaRecorder = new MediaRecorder(mediaStreamObj);
+            that.mediaRecorder = new MediaRecorder(mediaStreamObj, options, workerOptions);
 
-            that.mediaRecorder.ondataavailable = function (ev) {
-              that.mediaDataArray.push(ev.data);
-            }
-
-            that.mediaDataArray = [];
-
-            that.mediaRecorder.onstop = function (ev) {
+            // Set record to <audio> when recording will be finished
+            that.mediaRecorder.addEventListener('dataavailable', (e) => {
               clearInterval(that.timer);
-
-              const mediaBlob = new Blob(that.mediaDataArray, { 'type': 'audio/m4a' });
-              that.mediaDataArray = [];
-              that.$refs.audioPlayer.src = window.URL.createObjectURL(mediaBlob);
-
-              that.request(mediaBlob);
-            }
+              that.$refs.audioPlayer.src =  URL.createObjectURL(e.data);
+              that.request(e.data);
+            });
 
             that.mediaRecorder.start();
 
@@ -148,8 +154,10 @@ export default {
       //   audioData = blob
       // });
 
+      const filename = isSafari ? 'audio.wav' : 'audio.webm';
+
       const formData = new FormData();
-      formData.append('file', mediaBlob, 'audio.m4a');
+      formData.append('file', mediaBlob, filename);
       formData.append('model', 'whisper-1');
       formData.append('response_format', 'verbose_json');
       formData.append('temperature', 0);
