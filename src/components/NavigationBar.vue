@@ -54,9 +54,6 @@ export default {
             store
         }
     },
-  created() {
-      console.log("123")
-  },
   computed: {
     tag() {
       return store.tag
