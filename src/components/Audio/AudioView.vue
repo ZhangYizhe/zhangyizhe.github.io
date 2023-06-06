@@ -8,10 +8,10 @@
     <div class="container is-max-desktop">
       <div class="columns is-mobile is-multiline is-centered has-text-centered">
         <div class="column is-full">
-          {{ isHold ? (seconds > 0 ? 'Recorded ' + seconds + ' seconds.' : 'Waiting for recording.') : 'Please hold the below button to record.'}}
+          {{ !preHotTaskComplete ? (seconds > 0 ? 'Recorded ' + seconds + ' seconds.' : 'Wait! Preparing for recording.') : 'Please click the below button to record.' }}
         </div>
         <div class="column">
-          <button class="button is-success" style="width: 50%; height: 80px; font-size: 1.5rem" @touchstart="recordBtnTap" @touchend="stopRecordBtnTap" @mousedown="recordBtnTap" @mouseup="stopRecordBtnTap" :disabled="isLoading">{{ isRecording ? 'Recording...' : 'Hold to Record'}}</button>
+          <button :class="['button', isRecording ? 'is-danger' : 'is-success'] " style="width: 50%; height: 80px; font-size: 1.5rem" @click="isRecording ? stopRecordBtnTap() : startRecord()" :disabled="isLoading">{{ isRecording ? 'Click to finish' : 'Click to Record'}}</button>
         </div>
         <div class="column is-full">
           <audio ref="audioPlayer" controls></audio>
@@ -62,7 +62,7 @@ export default {
       message: "",
       defaultMessage: "<p style='color: gray; height: 100%; justify-content: center; align-items: center;  display: flex;'>Empty</p>",
 
-      isHold: false,
+      preHotTaskComplete: true,
       seconds: 0,
       timer: null,
     }
@@ -78,7 +78,8 @@ export default {
   methods: {
     startRecord() {
 
-      this.isHold = true;
+      this.isRecording = true;
+      this.preHotTaskComplete = false;
 
       const that = this;
 
@@ -94,7 +95,8 @@ export default {
 
             // Set record to <audio> when recording will be finished
             that.mediaRecorder.addEventListener('dataavailable', (e) => {
-              clearInterval(that.timer);
+              that.preHotTaskComplete = true;
+              that.isRecording = false;
               that.$refs.audioPlayer.src =  URL.createObjectURL(e.data);
               that.request(e.data);
             });
@@ -107,6 +109,7 @@ export default {
             }, 1000);
           })
           .catch(function (err) {
+            that.preHotTaskComplete = true;
             that.isRecording = false;
             that.disposeAudioRecorder();
             alert(err.name + ":" + err.message);
@@ -114,20 +117,18 @@ export default {
     },
 
     recordBtnTap() {
-      this.isRecording = true;
-
       this.cleanAllContent();
 
       this.startRecord();
     },
 
     stopRecordBtnTap() {
-      this.isRecording = false;
-
       this.disposeAudioRecorder();
     },
 
     async disposeAudioRecorder() {
+      clearInterval(this.timer);
+
       if (this.mediaRecorder !== null) {
         this.mediaRecorder.stop();
       }
@@ -186,6 +187,7 @@ export default {
       axios.post(this.store.aiProxy + '/v1/audio/transcriptions', formData, {headers})
           .then((response) => {
             this.isLoading = false
+            this.seconds = 0;
 
             const language = response.data['language'];
             const duration = response.data['duration'];
@@ -195,6 +197,7 @@ export default {
           .catch((error) => {
             this.isLoading = false
             this.message = "";
+            this.seconds = 0;
 
             try {
               const detail = error.response.data['error']['message']
