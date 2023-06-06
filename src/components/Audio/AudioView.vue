@@ -3,13 +3,19 @@
     <div class="container">
       <div class="columns is-mobile is-multiline is-centered has-text-centered">
         <div class="column">
-          <button class="button" @touchstart="recordBtnTap" @touchend="stopRecordBtnTap" @mousedown="recordBtnTap" @mouseup="stopRecordBtnTap" :disabled="isLoading">{{ isRecording ? 'Recording...' : 'Hold to Record'}}</button>
+          <button class="button is-success" @touchstart="recordBtnTap" @touchend="stopRecordBtnTap" @mousedown="recordBtnTap" @mouseup="stopRecordBtnTap" :disabled="isLoading">{{ isRecording ? 'Recording...' : 'Hold to Record'}}</button>
 
         </div>
         <div class="column is-full">
           <audio ref="audioPlayer" controls></audio>
         </div>
+        <div class="column is-full px-0" style="text-align: left; font-weight: bold; font-size: 1.2rem">
+          <span>Speech to text</span>
+        </div>
         <div class="column is-full message" v-html="message.trim() !== '' ? message : defaultMessage"></div>
+        <div class="column is-full px-0 pt-0" style="text-align: left; font-weight: bold; font-size: 1.2rem">
+          <button class="button is-danger" @click="cleanAllContent">Clean</button>
+        </div>
       </div>
 
     </div>
@@ -20,6 +26,7 @@
 import axios from "axios";
 import {Base64} from "js-base64";
 import {store} from "@/data/store";
+import {ref} from "vue";
 
 export default {
   name: "AudioView",
@@ -47,6 +54,7 @@ export default {
     this.store.tag = 'audio';
   },
   methods: {
+    ref,
     startRecord() {
 
       const that = this;
@@ -83,7 +91,7 @@ export default {
     recordBtnTap() {
       this.isRecording = true;
 
-      this.disposeAudioRecorder();
+      this.cleanAllContent();
 
       this.startRecord();
     },
@@ -111,6 +119,12 @@ export default {
       this.message = ""
     },
 
+    cleanAllContent() {
+      this.disposeAudioRecorder();
+      this.$refs.audioPlayer.src = "";
+      this.message = "";
+    },
+
     async request(mediaBlob) {
 
       if (mediaBlob === null) {
@@ -128,7 +142,7 @@ export default {
       formData.append('model', 'whisper-1');
       formData.append('response_format', 'verbose_json');
       formData.append('temperature', 0);
-      formData.append('prompt', 'If the audio does not contain any speech, please say "No speech"');
+      formData.append('prompt', '');
 
       this.isLoading = true;
 
