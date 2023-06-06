@@ -11,7 +11,7 @@
           {{ !preHotTaskComplete ? (seconds > 0 ? 'Recorded ' + seconds + ' seconds.' : 'Wait! Preparing for recording.') : 'Please click the below button to record.' }}
         </div>
         <div class="column">
-          <button :class="['button', isRecording ? 'is-danger' : 'is-success'] " style="width: 50%; height: 80px; font-size: 1.5rem" @click="isRecording ? stopRecordBtnTap() : startRecord()" :disabled="isLoading">{{ isRecording ? 'Click to finish' : 'Click to Record'}}</button>
+          <button :class="['button', isRecording ? 'is-danger' : 'is-success', isLoading ? 'is-loading' : ''] " style="width: 80%; height: 80px; font-size: 1.5rem" @click="isRecording ? stopRecordBtnTap() : startRecord()" :disabled="isLoading">{{ isRecording ? 'Click to finish' : 'Click to Record'}}</button>
         </div>
         <div class="column is-full">
           <audio ref="audioPlayer" controls></audio>
