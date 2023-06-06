@@ -2,9 +2,11 @@
   <section class="section">
     <div class="container">
       <div class="columns is-mobile is-multiline is-centered has-text-centered">
+        <div class="column is-full">
+          {{ seconds === null ? 'No record.' : 'Recorded ' + seconds + ' seconds.'}}
+        </div>
         <div class="column">
-          <button class="button is-success" @touchstart="recordBtnTap" @touchend="stopRecordBtnTap" @mousedown="recordBtnTap" @mouseup="stopRecordBtnTap" :disabled="isLoading">{{ isRecording ? 'Recording...' : 'Hold to Record'}}</button>
-
+          <button class="button is-success" style="width: 50%; height: 80px" @touchstart="recordBtnTap" @touchend="stopRecordBtnTap" @mousedown="recordBtnTap" @mouseup="stopRecordBtnTap" :disabled="isLoading">{{ isRecording ? 'Recording...' : 'Hold to Record'}}</button>
         </div>
         <div class="column is-full">
           <audio ref="audioPlayer" controls></audio>
@@ -14,7 +16,7 @@
         </div>
         <div class="column is-full message" v-html="message.trim() !== '' ? message : defaultMessage"></div>
         <div class="column is-full px-0 pt-0" style="text-align: left; font-weight: bold; font-size: 1.2rem">
-          <button class="button is-danger" @click="cleanAllContent">Clean</button>
+          <button class="button is-danger" @click="cleanAllContent" :disabled="isLoading">Clean</button>
         </div>
       </div>
 
@@ -43,6 +45,9 @@ export default {
 
       message: "",
       defaultMessage: "<p style='color: gray; height: 100%; justify-content: center; align-items: center;  display: flex;'>Please hold to record</p>",
+
+      seconds: null,
+      timer: null,
     }
   },
   computed: {
@@ -54,7 +59,6 @@ export default {
     this.store.tag = 'audio';
   },
   methods: {
-    ref,
     startRecord() {
 
       const that = this;
@@ -72,7 +76,9 @@ export default {
             that.mediaDataArray = [];
 
             that.mediaRecorder.onstop = function (ev) {
-              const mediaBlob = new Blob(that.mediaDataArray, { 'type': 'audio/mp3' });
+              clearInterval(that.timer);
+
+              const mediaBlob = new Blob(that.mediaDataArray, { 'type': 'audio/m4a' });
               that.mediaDataArray = [];
               that.$refs.audioPlayer.src = window.URL.createObjectURL(mediaBlob);
 
@@ -80,6 +86,11 @@ export default {
             }
 
             that.mediaRecorder.start();
+
+            that.seconds = 0;
+            that.timer = setInterval(function () {
+              that.seconds++;
+            }, 1000);
           })
           .catch(function (err) {
             that.isRecording = false;
@@ -116,13 +127,13 @@ export default {
       this.mediaRecorder = null
       this.mediaDataArray = []
       this.mediaStreamObj = null
-      this.message = ""
     },
 
     cleanAllContent() {
       this.disposeAudioRecorder();
       this.$refs.audioPlayer.src = "";
       this.message = "";
+      this.seconds = null
     },
 
     async request(mediaBlob) {
@@ -138,7 +149,7 @@ export default {
       // });
 
       const formData = new FormData();
-      formData.append('file', mediaBlob, 'audio.mp3');
+      formData.append('file', mediaBlob, 'audio.m4a');
       formData.append('model', 'whisper-1');
       formData.append('response_format', 'verbose_json');
       formData.append('temperature', 0);
