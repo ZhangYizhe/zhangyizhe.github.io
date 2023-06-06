@@ -1,4 +1,5 @@
 import {createRouter, createWebHashHistory, createWebHistory} from 'vue-router'
+import {store} from "@/data/store";
 
 const routes = [
     {
@@ -17,6 +18,12 @@ const routes = [
         path: '/grammar',
         name: 'grammar',
         component: () => import('@/components/Grammar/GrammarView.vue'),
+    },
+
+    {
+        path: '/audio',
+        name: 'audio',
+        component: () => import('@/components/Audio/AudioView.vue'),
     },
 
     {
@@ -47,7 +54,7 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from) => {
-
+    store.isExpended = false;
 })
 
 export default router

@@ -8,7 +8,7 @@
                     </a>
 
                     <a role="button" :class="['navbar-burger', isExpended ? 'is-active' : '']" aria-label="menu"
-                       aria-expanded="false" @click="isExpended = !isExpended">
+                       aria-expanded="false" @click="store.isExpended = !store.isExpended">
                         <span aria-hidden="true"></span>
                         <span aria-hidden="true"></span>
                         <span aria-hidden="true"></span>
@@ -27,10 +27,12 @@
                             Grammar
                         </router-link>
                         <router-link to="/chat" :class="['navbar-item', tag === 'chat' ? 'is-active' : '']">
-                            Chat<span
-                                style="font-size: 10px; margin-left: 5px; padding: 2px 5px; background-color: green; color: white; border-radius: 5px">Beta</span>
+                            Chat
                         </router-link>
-
+                        <router-link to="/audio" :class="['navbar-item', tag === 'audio' ? 'is-active' : '']">
+                          Audio<span
+                            style="font-size: 10px; margin-left: 5px; padding: 2px 5px; background-color: green; color: white; border-radius: 5px">Beta</span>
+                        </router-link>
                         <router-link to="/imageai" :class="['navbar-item', tag === 'imageai' ? 'is-active' : '']">
                             Image AI<span
                                 style="font-size: 10px; margin-left: 5px; padding: 2px 5px; background-color: green; color: white; border-radius: 5px">Beta</span>
@@ -49,15 +51,20 @@ export default {
     name: "NavigationBar",
     data() {
         return {
-            store,
-            isExpended: false
+            store
         }
     },
-    computed: {
-        tag() {
-            return store.tag
-        }
-    }
+  created() {
+      console.log("123")
+  },
+  computed: {
+    tag() {
+      return store.tag
+    },
+    isExpended() {
+      return store.isExpended
+    },
+  }
 }
 </script>
 
