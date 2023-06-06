@@ -1,18 +1,23 @@
 <template>
-  <section class="section">
-    <div class="container">
+  <section class="section pl-3 pt-2 pb-0">
+    <div class="container is-max-desktop">
+      <p style="font-size: 1.3rem;">Speech To Text</p>
+    </div>
+  </section>
+  <section class="section pt-3">
+    <div class="container is-max-desktop">
       <div class="columns is-mobile is-multiline is-centered has-text-centered">
         <div class="column is-full">
-          {{ seconds === null ? 'No record.' : 'Recorded ' + seconds + ' seconds.'}}
+          {{ isHold ? (seconds > 0 ? 'Recorded ' + seconds + ' seconds.' : 'Waiting for recording.') : 'Please hold the below button to record.'}}
         </div>
         <div class="column">
-          <button class="button is-success" style="width: 50%; height: 80px" @touchstart="recordBtnTap" @touchend="stopRecordBtnTap" @mousedown="recordBtnTap" @mouseup="stopRecordBtnTap" :disabled="isLoading">{{ isRecording ? 'Recording...' : 'Hold to Record'}}</button>
+          <button class="button is-success" style="width: 50%; height: 80px; font-size: 1.5rem" @touchstart="recordBtnTap" @touchend="stopRecordBtnTap" @mousedown="recordBtnTap" @mouseup="stopRecordBtnTap" :disabled="isLoading">{{ isRecording ? 'Recording...' : 'Hold to Record'}}</button>
         </div>
         <div class="column is-full">
           <audio ref="audioPlayer" controls></audio>
         </div>
-        <div class="column is-full px-0" style="text-align: left; font-weight: bold; font-size: 1.2rem">
-          <span>Speech to text</span>
+        <div class="column is-full px-0" style="text-align: left; font-size: 1.2rem">
+          <span>Results</span>
         </div>
         <div class="column is-full message" v-html="message.trim() !== '' ? message : defaultMessage"></div>
         <div class="column is-full px-0 pt-0" style="text-align: left; font-weight: bold; font-size: 1.2rem">
@@ -55,9 +60,10 @@ export default {
       mediaStreamObj: null,
 
       message: "",
-      defaultMessage: "<p style='color: gray; height: 100%; justify-content: center; align-items: center;  display: flex;'>Please hold to record</p>",
+      defaultMessage: "<p style='color: gray; height: 100%; justify-content: center; align-items: center;  display: flex;'>Empty</p>",
 
-      seconds: null,
+      isHold: false,
+      seconds: 0,
       timer: null,
     }
   },
@@ -71,6 +77,8 @@ export default {
   },
   methods: {
     startRecord() {
+
+      this.isHold = true;
 
       const that = this;
 
@@ -139,10 +147,15 @@ export default {
       this.disposeAudioRecorder();
       this.$refs.audioPlayer.src = "";
       this.message = "";
-      this.seconds = null
+      this.seconds = 0
     },
 
     async request(mediaBlob) {
+
+      if (this.seconds < 2) {
+        alert('Please record at least 2 seconds.');
+        return;
+      }
 
       if (mediaBlob === null) {
         return;

@@ -1,4 +1,9 @@
 <template>
+  <section class="section pl-3 pt-2 pb-0">
+    <div class="container is-max-desktop">
+      <p style="font-size: 1.3rem;">Image AI</p>
+    </div>
+  </section>
 <div class="container py-5 px-3">
     <div class="columns is-multiline is-mobile is-centered">
         <div class="column is-full-mobile is-6-tablet">
