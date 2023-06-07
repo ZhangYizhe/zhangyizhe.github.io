@@ -8,13 +8,13 @@
     <div class="container is-max-desktop">
       <div class="columns is-mobile is-multiline is-centered has-text-centered">
         <div class="column is-full">
+          <audio ref="audioPlayer" controls></audio>
+        </div>
+        <div class="column is-full">
           {{ !preHotTaskComplete ? (seconds > 0 ? 'Recorded ' + seconds + ' seconds.' : 'Wait! Preparing for recording.') : 'Please click the below button to record.' }}
         </div>
         <div class="column">
           <button :class="['button', isRecording ? 'is-danger' : 'is-success', isLoading ? 'is-loading' : ''] " style="width: 80%; height: 80px; font-size: 1.5rem" @click="isRecording ? stopRecordBtnTap() : startRecord()" :disabled="isLoading">{{ isRecording ? 'Click to finish' : 'Click to Record'}}</button>
-        </div>
-        <div class="column is-full">
-          <audio ref="audioPlayer" controls></audio>
         </div>
         <div class="column is-full px-0" style="text-align: left; font-size: 1.2rem">
           <span>Results</span>
