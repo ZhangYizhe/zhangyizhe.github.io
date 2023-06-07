@@ -112,7 +112,7 @@ export default {
 
       systemMessages: {
         role: "system",
-        content: "你是一個非常聰明的助手，你的名字叫Elecoxy。",
+        content: "",
       },
 
       recordsNum: 20,
@@ -166,10 +166,7 @@ export default {
     resetConversation() {
 
       this.messages = [
-        {
-          "role": "assistant",
-          "content": "你好，請問有什麽可以幫到你?",
-        }
+
       ]
 
       this.storageMessages = JSON.parse(JSON.stringify(this.messages))
@@ -209,7 +206,7 @@ export default {
         },
         body: JSON.stringify({
           model: "gpt-3.5-turbo",
-          messages: [this.systemMessages, ...this.storageMessages],
+          messages: [...this.storageMessages, this.systemMessages],
           stream: true,
         }),
         async onopen(response) {
