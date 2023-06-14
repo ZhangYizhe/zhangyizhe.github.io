@@ -205,7 +205,7 @@ export default {
           'Authorization': 'Bearer ' + this.token
         },
         body: JSON.stringify({
-          model: "gpt-3.5-turbo",
+          model: this.store.modelVersion,
           messages: [...this.storageMessages, this.systemMessages],
           stream: true,
         }),

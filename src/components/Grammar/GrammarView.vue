@@ -88,7 +88,7 @@ export default {
         return {
             store,
 
-            grammarVersion: '1.3.0',
+            grammarVersion: '1.4.0',
 
             leftInput: '',
             rightInput: '',
@@ -165,7 +165,7 @@ export default {
             };
 
             axios.post(this.store.aiProxy + '/v1/chat/completions', {
-                model: "gpt-3.5-turbo",
+                model: this.store.modelVersion,
                 temperature: 0,
                 messages: [
                     {
