@@ -206,7 +206,7 @@ export default {
         },
         body: JSON.stringify({
           model: this.store.modelVersion,
-          messages: [...this.storageMessages, this.systemMessages],
+          messages: [this.systemMessages, ...this.storageMessages],
           stream: true,
         }),
         async onopen(response) {
@@ -232,15 +232,6 @@ export default {
         },
         onmessage(msg) {
           if (msg.data === '[DONE]') {
-            subThis.isLoading = false;
-            return;
-          }
-          const msgData = JSON.parse(msg.data)
-
-          const delta = msgData['choices'][0]['delta']
-          const finish_reason = msgData['choices'][0]['finish_reason']
-
-          if (finish_reason === 'stop') {
             const stopMessage = {
               "role": "assistant",
               "content": subThis.tempMessage
@@ -253,6 +244,10 @@ export default {
             subThis.storageMessages.push(stopMessage);
             return;
           }
+          const msgData = JSON.parse(msg.data)
+
+          const delta = msgData['choices'][0]['delta']
+          const finish_reason = msgData['choices'][0]['finish_reason']
 
           if (delta['content'] !== undefined) {
             subThis.tempMessage += delta["content"];
