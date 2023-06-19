@@ -247,7 +247,7 @@ export default {
           const msgData = JSON.parse(msg.data)
 
           const delta = msgData['choices'][0]['delta']
-          const finish_reason = msgData['choices'][0]['finish_reason']
+          // const finish_reason = msgData['choices'][0]['finish_reason']
 
           if (delta['content'] !== undefined) {
             subThis.tempMessage += delta["content"];
