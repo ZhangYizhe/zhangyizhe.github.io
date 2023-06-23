@@ -20,17 +20,17 @@ const routes = [
         component: () => import('@/components/Grammar/GrammarView.vue'),
     },
 
-    {
-        path: '/audio',
-        name: 'audio',
-        component: () => import('@/components/Audio/AudioView.vue'),
-    },
-
-    {
-        path: '/imageai',
-        name: 'imageai',
-        component: () => import('@/components/ImageAI/ImageAIView.vue'),
-    },
+    // {
+    //     path: '/audio',
+    //     name: 'audio',
+    //     component: () => import('@/components/Audio/AudioView.vue'),
+    // },
+    //
+    // {
+    //     path: '/imageai',
+    //     name: 'imageai',
+    //     component: () => import('@/components/ImageAI/ImageAIView.vue'),
+    // },
 
     {
         path: '/privacy-policy',
