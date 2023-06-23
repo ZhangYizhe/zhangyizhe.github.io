@@ -115,7 +115,7 @@ export default {
     },
     computed: {
         token() {
-            return Base64.decode(store.grammarToken);
+            return "";
         }
     },
     mounted() {
@@ -161,7 +161,7 @@ export default {
                 "Text: ```" + this.leftInput + "```"
 
             const headers = {
-                'Authorization': 'Bearer ' + this.token
+                // 'Authorization': 'Bearer ' + this.token
             };
 
             axios.post(this.store.aiProxy + '/v1/chat/completions', {

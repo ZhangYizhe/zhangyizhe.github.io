@@ -47,7 +47,7 @@ export default {
     },
     computed: {
         token() {
-            return Base64.decode(store.imageToken);
+            return "";
         }
     },
     mounted() {
@@ -63,7 +63,7 @@ export default {
             this.isLoading = true;
 
             const headers = {
-                'Authorization': 'Bearer ' + this.token
+                // 'Authorization': 'Bearer ' + this.token
             };
 
             axios.post(this.store.aiProxy + '/v1/images/generations', {
