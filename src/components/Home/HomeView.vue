@@ -98,9 +98,15 @@ export default {
         ],
         timeline: [
           {
+            title: 'Senior Research Assistant at HKBU',
+            isActive: false,
+            timeline: 'Next academic year',
+            description: 'Conversation Recommender Systems.',
+          },
+          {
             title: 'Research Assistant at HKBU',
             isActive: true,
-            timeline: '2022 - Currently',
+            timeline: '08/2022 - 07/2023',
             description: 'Recommender Systems.',
           },
           {
