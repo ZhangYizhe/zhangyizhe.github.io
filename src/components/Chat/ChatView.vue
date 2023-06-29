@@ -21,6 +21,10 @@
                     <h1 class="column is-full" style="padding-left: 0; font-weight: bold">當前可記住對話輪次數（一次問答為一輪, 請不要超過50輪）</h1>
                     <input class="column systemMessage" v-model="recordsNum" placeholder="請輸入雙數。" type="number">
                   </div>
+                  <div class="columns is-multiline is-mobile">
+                    <h1 class="column is-full" style="padding-left: 0; font-weight: bold">使用密碼</h1>
+                    <input class="column systemMessage" v-model="elecoxyKey" placeholder="請輸入密碼" type="password" @change="elecoxyKeySet">
+                  </div>
                 </div>
               </div>
             </div>
@@ -82,8 +86,10 @@
   <div :class="['inputView', isLoading ? 'inputView-disabled' : '']">
     <div class="columns is-gapless is-mobile">
       <div class="column">
-        <textarea v-model="inputText" placeholder="說點什麼吧" ref="inputRef" @keyup.enter.exact="sendBtnTap"
+        <textarea v-model="inputText" placeholder="說點什麼吧" ref="inputRef"
                   :disabled="isLoading"></textarea>
+
+          <!--  @keyup.enter.exact="sendBtnTap"-->
       </div>
       <div class="column is-narrow" style="margin: 0 0 0 5px">
         <button type="button" class="button" @click="sendBtnTap" :disabled="isLoading"><i class="bi bi-send"></i>
@@ -109,6 +115,8 @@ export default {
   data() {
     return {
       store,
+
+      elecoxyKey: "",
 
       systemMessages: {
         role: "system",
@@ -138,6 +146,8 @@ export default {
   },
   mounted() {
     this.store.tag = 'chat';
+
+    this.elecoxyKeyGet();
 
     this.resetConversation();
   },
@@ -176,6 +186,11 @@ export default {
     },
 
     sendBtnTap(e) {
+      if (this.elecoxyKey !== this.store.elecoxyKey) {
+        alert('Please input correct elecoxy key.')
+        return
+      }
+
       const textTrim = this.inputText.trim();
 
       if (textTrim === '') {
@@ -195,6 +210,11 @@ export default {
     },
 
     async request() {
+      if (this.elecoxyKey !== this.store.elecoxyKey) {
+        alert('Please input correct elecoxy key.')
+        return
+      }
+
       this.isLoading = true;
       const subThis = this;
 
@@ -202,7 +222,6 @@ export default {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // 'Authorization': 'Bearer ' + this.token
         },
         body: JSON.stringify({
           messages: [this.systemMessages, ...this.storageMessages],
@@ -293,6 +312,16 @@ export default {
       el.scrollTop = el.scrollHeight;
     },
 
+    elecoxyKeyGet() {
+      const tempPassword = this.$cookies.get('elecoxyKey');
+      this.elecoxyKey = tempPassword === undefined ? "" : tempPassword;
+
+      return this.elecoxyKey;
+    },
+
+    elecoxyKeySet() {
+      this.$cookies.set('elecoxyKey', this.elecoxyKey)
+    }
 
   }
 }
