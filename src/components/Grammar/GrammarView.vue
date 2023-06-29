@@ -164,8 +164,7 @@ export default {
                 // 'Authorization': 'Bearer ' + this.token
             };
 
-            axios.post(this.store.aiProxy + '/v1/chat/completions', {
-                model: this.store.modelVersion,
+            axios.post(this.store.aiProxy + `/openai/deployments/${store.modelVersion}/chat/completions?api-version=${store.apiVersion}`,{
                 temperature: 0,
                 messages: [
                     {

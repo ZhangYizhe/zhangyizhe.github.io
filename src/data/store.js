@@ -5,5 +5,6 @@ export const store = reactive({
     isExpended: false,
     aiProxy: 'https://ai.yizheyun.cn',
 
-    modelVersion: 'gpt-3.5-turbo-0613',
+    modelVersion: 'gpt-35-turbo',
+    apiVersion: '2023-05-15'
 })

@@ -198,14 +198,13 @@ export default {
       this.isLoading = true;
       const subThis = this;
 
-      await fetchEventSource(this.store.aiProxy + '/v1/chat/completions', {
+      await fetchEventSource(this.store.aiProxy + `/openai/deployments/${store.modelVersion}/chat/completions?api-version=${store.apiVersion}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           // 'Authorization': 'Bearer ' + this.token
         },
         body: JSON.stringify({
-          model: this.store.modelVersion,
           messages: [this.systemMessages, ...this.storageMessages],
           stream: true,
         }),
@@ -231,7 +230,11 @@ export default {
           }
         },
         onmessage(msg) {
-          if (msg.data === '[DONE]') {
+          const data = JSON.parse(msg.data);
+          const delta = data.choices[0].delta;
+          const finish_reason = data.choices[0].finish_reason;
+
+          if (finish_reason !== null) {
             const stopMessage = {
               "role": "assistant",
               "content": subThis.tempMessage
@@ -244,10 +247,6 @@ export default {
             subThis.storageMessages.push(stopMessage);
             return;
           }
-          const msgData = JSON.parse(msg.data)
-
-          const delta = msgData['choices'][0]['delta']
-          // const finish_reason = msgData['choices'][0]['finish_reason']
 
           if (delta['content'] !== undefined) {
             subThis.tempMessage += delta["content"];
