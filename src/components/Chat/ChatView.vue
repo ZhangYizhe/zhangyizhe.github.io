@@ -214,6 +214,7 @@ export default {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'elecoxy-key': this.elecoxyKey,
         },
         body: JSON.stringify({
           messages: [this.systemMessages, ...this.storageMessages],
