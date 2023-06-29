@@ -7,6 +7,4 @@ export const store = reactive({
 
     modelVersion: 'gpt-35-turbo',
     apiVersion: '2023-05-15',
-
-    elecoxyKey: 'hci',
 })

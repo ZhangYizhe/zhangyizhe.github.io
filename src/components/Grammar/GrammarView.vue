@@ -6,8 +6,8 @@
         ( {{ grammarVersion }} )
       </button>
       <div class="columns is-multiline is-mobile mt-3 mx-0 mb-2">
-        <h1 class="column is-full p-0 mb-2" style="font-weight: bold">使用密碼</h1>
-        <input class="column is-6 systemMessage" v-model="elecoxyKey" placeholder="請輸入密碼" type="password" @change="elecoxyKeySet">
+        <h1 class="column is-full p-0 mb-2" style="font-weight: bold">Elecoxy Key</h1>
+        <input class="column is-6 systemMessage" v-model="elecoxyKey" placeholder="Please input the elecoxy key" type="password" @change="elecoxyKeySet">
       </div>
     </div>
   </div>
@@ -151,11 +151,6 @@ export default {
 
     request() {
 
-      if (this.elecoxyKey !== this.store.elecoxyKey) {
-        alert('Please input correct elecoxy key.')
-        return
-      }
-
       if (this.leftInput === "") {
         return
       }
@@ -176,6 +171,7 @@ export default {
 
       const headers = {
         'Content-Type': 'application/json',
+        'elecoxy-key': this.elecoxyKey,
       };
 
       axios.post(this.store.aiProxy + `/openai/deployments/${store.modelVersion}/chat/completions?api-version=${store.apiVersion}`, {
@@ -190,11 +186,14 @@ export default {
           .then((response) => {
             this.isLoading = false
 
-            this.rightInput = response.data['choices'][0]['message']["content"];
+            try {
+              this.rightInput = response.data['choices'][0]['message']["content"];
+            } catch (e) {
+              alert(response.data)
+            }
           })
           .catch((error) => {
             this.isLoading = false
-
             try {
               const detail = error.response.data['error']['message']
               alert(detail);

@@ -22,8 +22,8 @@
                     <input class="column systemMessage" v-model="recordsNum" placeholder="請輸入雙數。" type="number">
                   </div>
                   <div class="columns is-multiline is-mobile">
-                    <h1 class="column is-full" style="padding-left: 0; font-weight: bold">使用密碼</h1>
-                    <input class="column systemMessage" v-model="elecoxyKey" placeholder="請輸入密碼" type="password" @change="elecoxyKeySet">
+                    <h1 class="column is-full" style="padding-left: 0; font-weight: bold">Elecoxy Key</h1>
+                    <input class="column systemMessage" v-model="elecoxyKey" placeholder="Please input the elecoxy key" type="password" @change="elecoxyKeySet">
                   </div>
                 </div>
               </div>
@@ -186,10 +186,6 @@ export default {
     },
 
     sendBtnTap(e) {
-      if (this.elecoxyKey !== this.store.elecoxyKey) {
-        alert('Please input correct elecoxy key.')
-        return
-      }
 
       const textTrim = this.inputText.trim();
 
@@ -210,10 +206,6 @@ export default {
     },
 
     async request() {
-      if (this.elecoxyKey !== this.store.elecoxyKey) {
-        alert('Please input correct elecoxy key.')
-        return
-      }
 
       this.isLoading = true;
       const subThis = this;
@@ -228,14 +220,20 @@ export default {
           stream: true,
         }),
         async onopen(response) {
-          if (response.ok) {
+          if (response.status === 200) {
             subThis.tempMessage = "";
             return;
           }
 
           switch (response.status) {
+            case 201 :
+              alert(`Error Code: ${response.status}, invalid Elecoxy key.`);
+              break;
             case 401 :
-              alert(`Error Code: ${response.status}, invalid Authentication, please try again later.`);
+              alert(`Error Code: ${response.status}, invalid Authentication.`);
+              break;
+            case 403 :
+              alert(`Error Code: ${response.status}, invalid Elecoxy Authentication, please try again later.`);
               break;
             case 429 :
               alert(`Error Code: ${response.status}, rate limit reached for requests, please try again later.`);
@@ -276,7 +274,9 @@ export default {
 
         },
         onerror(err) {
-
+          subThis.isLoading = false;
+          subThis.tempMessage = "";
+          throw err;
         }
       })
 
