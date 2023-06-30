@@ -1,10 +1,16 @@
 <template>
   <div style="background-color: #fafafa; padding-bottom: 35px">
     <div class="container py-3 px-3">
-      <button class="button is-link" style="font-size: 0.8rem; font-weight: bold"><i class="bi bi-spellcheck"
-                                                                                     style="margin-right: 5px; font-size: 1rem"></i>Grammar
-        ( {{ grammarVersion }} )
-      </button>
+      <div class="buttons">
+        <button :class="['button', isGrammar ? 'is-link' : '']" style="font-size: 0.8rem; font-weight: bold" @click="isGrammar = true"><i class="bi bi-spellcheck"
+                                                                                       style="margin-right: 5px; font-size: 1rem"></i>Grammar
+          ( {{ grammarVersion }} )
+        </button>
+        <button :class="['button', isGrammar ? '' : 'is-link']" style="font-size: 0.8rem; font-weight: bold" @click="isGrammar = false"><i class="bi bi-spellcheck"
+                                                                                       style="margin-right: 5px; font-size: 1rem"></i>Translate
+          ( {{ translateVersion }} )
+        </button>
+      </div>
       <div class="columns is-multiline is-mobile mt-3 mx-0 mb-2">
         <h1 class="column is-full p-0 mb-2" style="font-weight: bold">Elecoxy Key</h1>
         <input class="column is-6 systemMessage" v-model="elecoxyKey" placeholder="Please input the elecoxy key" type="password" @change="elecoxyKeySet">
@@ -45,7 +51,7 @@
                   <div class="loader is-loading"></div>
                 </div>
               </template>
-              Check
+              {{ isGrammar ? 'Grammar' : 'Translate' }}
             </button>
           </div>
         </div>
@@ -94,6 +100,7 @@ export default {
       store,
 
       grammarVersion: '1.5.0',
+      translateVersion: '1.0.0',
 
       elecoxyKey: "",
 
@@ -103,6 +110,20 @@ export default {
       isLoading: false,
 
       copyBtnStr: "Copy",
+
+      isGrammar: true,
+
+      translationPrompt: "I want you to act as an English translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in English. I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, upper level English words and sentences. Keep the meaning same, but make them more literary. I want you to only reply the correction, the improvements and nothing else, do not write explanations.\n",
+
+      grammarPrompt: "Proofread and correct the below text and rewrite " +
+          "the corrected version, the text was delimited with " +
+          "triple backticks. If you don't find any errors, " +
+          "just response the original text. You only response " +
+          "the correct result without any other description. " +
+          "\n" +
+          "After reply the result, check the content by the below steps:\n" +
+          "Step-1: Don't use triple backticks around the text.\n" +
+          "Step-2: Don't use conversation tune to response.\n"
     }
   },
   watch: {
@@ -121,8 +142,16 @@ export default {
     }
   },
   computed: {
-    token() {
-      return "";
+    prompt() {
+      let prompt = ""
+      if (this.isGrammar) {
+        prompt = this.grammarPrompt
+      } else {
+        prompt = this.translationPrompt
+      }
+
+      return prompt + "\n" +
+          "Text: ```" + this.leftInput + "```"
     }
   },
   mounted() {
@@ -157,17 +186,7 @@ export default {
 
       this.isLoading = true;
 
-      let prompt = "Proofread and correct the below text and rewrite " +
-          "the corrected version, the text was delimited with " +
-          "triple backticks. If you don't find any errors, " +
-          "just response the original text. You only response " +
-          "the correct result without any other description. " +
-          "\n" +
-          "After reply the result, check the content by the below steps:\n" +
-          "Step-1: Don't use triple backticks around the text.\n" +
-          "Step-2: Don't use conversation tune to response." +
-          "\n" +
-          "Text: ```" + this.leftInput + "```"
+      let prompt = this.prompt;
 
       const headers = {
         'Content-Type': 'application/json',

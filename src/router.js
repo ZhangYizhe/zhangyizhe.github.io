@@ -15,9 +15,9 @@ const routes = [
     },
 
     {
-        path: '/grammar',
-        name: 'grammar',
-        component: () => import('@/components/Grammar/GrammarView.vue'),
+        path: '/language',
+        name: 'language',
+        component: () => import('@/components/Language/LanguageView.vue'),
     },
 
     // {

@@ -23,8 +23,8 @@
                         <!--            <router-link to="/" :class="['navbar-item', tag === 'projects' ? 'is-active' : '']">-->
                         <!--              Projects-->
                         <!--            </router-link>-->
-                        <router-link to="/grammar" :class="['navbar-item', tag === 'grammar' ? 'is-active' : '']">
-                            Grammar
+                        <router-link to="/language" :class="['navbar-item', tag === 'language' ? 'is-active' : '']">
+                            Language
                         </router-link>
                         <router-link to="/chat" :class="['navbar-item', tag === 'chat' ? 'is-active' : '']">
                             Chat
