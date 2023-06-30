@@ -94,7 +94,7 @@ import {store} from "@/data/store";
 import {Base64} from "js-base64";
 
 export default {
-  name: "GrammarView",
+  name: "LanguageView",
   data() {
     return {
       store,
@@ -155,7 +155,7 @@ export default {
     }
   },
   mounted() {
-    this.store.tag = 'grammar';
+    this.store.tag = 'language';
 
     this.elecoxyKeyGet();
   },
