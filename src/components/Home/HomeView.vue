@@ -77,14 +77,14 @@ export default {
       user: {
         avatar: '/img/home/author.png',
         name: 'Yizhe ZHANG',
-        title: 'Research Assistant | HKBU',
+        title: 'Senior Research Assistant | HKBU',
         mail: 'yizhezhang[at]hkbu.edu.hk',
         location: 'Hong Kong SAR, China',
         website: 'https://elecoxy.com',
         github: 'https://github.com/zhangyizhe',
         content: {
           title: '👋 Hello , Good Day !',
-          description: 'I am a Research Assistant in the Department of Computer Science at Hong Kong Baptist University under the supervision of Dr. Li Chen. I received my M.Sc. degree in Data Analytics and Artificial Intelligence from Hong Kong Baptist University in 2022. In 2018, I received my B.Sc. degree in Computer Science and Technology from ZHIXING College of Northwest Normal University, China.<br><br>Research Interests: Recommender Systems, Human-Computer Interaction, Software Engineering.<br><br>Our <a href="https://hci.comp.hkbu.edu.hk" target="_blank">"Positive Intelligence" Lab</a> conducts interdisciplinary research on intelligent technology for well-being.',
+          description: 'I am a Senior Research Assistant in the Department of Computer Science at Hong Kong Baptist University under the supervision of Prof. CHEN, Li. I received my M.Sc. degree in Data Analytics and Artificial Intelligence from Hong Kong Baptist University in 2022. In 2018, I received my B.Sc. degree in Computer Science and Technology from ZHIXING College of Northwest Normal University, China.<br><br>Research Interests: Recommender Systems, Human-Computer Interaction, Software Engineering.<br><br>Our <a href="https://hci.comp.hkbu.edu.hk" target="_blank">"Positive Intelligence" Lab</a> conducts interdisciplinary research on intelligent technology for well-being.',
         },
         skills: [
           {
@@ -99,13 +99,13 @@ export default {
         timeline: [
           {
             title: 'Senior Research Assistant at HKBU',
-            isActive: false,
-            timeline: 'Next academic year',
+            isActive: true,
+            timeline: '2023 - Present',
             description: 'Conversation Recommender Systems.',
           },
           {
-            title: 'Research Assistant at HKBU',
-            isActive: true,
+            title: '2022 - Research Assistant at HKBU',
+            isActive: false,
             timeline: '08/2022 - 07/2023',
             description: 'Recommender Systems.',
           },
