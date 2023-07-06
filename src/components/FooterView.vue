@@ -1,3 +1,12 @@
+<script setup>
+import { useConfigStore } from "@/data/useConfigStore";
+import {computed} from "vue";
+
+const config = useConfigStore()
+
+const isDisplay = computed(() => config.tag !== 'chat')
+</script>
+
 <template>
   <footer class="footer py-6" v-if="isDisplay">
     <div class="content has-text-centered">
@@ -10,27 +19,6 @@
     </div>
   </footer>
 </template>
-
-<script>
-import {store} from "@/data/store";
-
-export default {
-  name: "FooterView",
-  data() {
-    return {
-      store,
-    }
-  },
-  computed: {
-    isDisplay() {
-      if (store.tag === 'chat') {
-        return false
-      }
-      return true
-    }
-  }
-}
-</script>
 
 <style scoped>
 

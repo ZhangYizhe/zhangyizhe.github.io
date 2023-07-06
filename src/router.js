@@ -1,5 +1,5 @@
-import {createRouter, createWebHashHistory, createWebHistory} from 'vue-router'
-import {store} from "@/data/store";
+import {createRouter, createWebHashHistory} from 'vue-router'
+import {useConfigStore} from "@/data/useConfigStore";
 
 const routes = [
     {
@@ -54,7 +54,8 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from) => {
-    store.isExpended = false;
+    const config = useConfigStore();
+    config.isExpended = false;
 })
 
 export default router

@@ -1,19 +1,180 @@
+<script setup>
+import { useConfigStore } from "@/data/useConfigStore";
+import {computed, onMounted, ref, watch} from "vue";
+import axios from "axios";
+
+const config = useConfigStore();
+
+const inputs = ref({
+  left: '',
+  right: '',
+})
+
+const leftInputRef = ref(null);
+const rightInputRef = ref(null);
+
+const isLoading = ref(false);
+const copyBtnStr = ref("Copy");
+const isGrammar = ref(true);
+
+const prompts = ref({
+  translation: "I want you to act as an English translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in English. I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, upper level English words and sentences. Keep the meaning same, but make them more literary. I want you to only reply the correction, the improvements and nothing else, do not write explanations.\n",
+
+  grammar: "Proofread and correct the below text and rewrite " +
+      "the corrected version, the text was delimited with " +
+      "triple backticks. If you don't find any errors, " +
+      "just response the original text. You only response " +
+      "the correct result without any other description. " +
+      "\n" +
+      "After reply the result, check the content by the below steps:\n" +
+      "Step-1: Don't use triple backticks around the text.\n" +
+      "Step-2: Don't use conversation tune to response.\n"
+})
+
+const prompt = computed(() => {
+  let prompt = ""
+  if (isGrammar.value) {
+    prompt = prompts.value.grammar
+  } else {
+    prompt = prompts.value.translation
+  }
+
+  return prompt + "\n" +
+      "Text: ```" + inputs.value.left + "```"
+})
+
+function resizeTextarea() {
+  leftInputRef.value.style.height = 0 + 'px';
+  rightInputRef.value.style.height = 0 + 'px';
+
+  let leftHeight = leftInputRef.value.scrollHeight;
+  let rightHeight = rightInputRef.value.scrollHeight;
+
+  let finalHeight;
+  if (leftHeight >= rightHeight) {
+    finalHeight = leftHeight
+  } else {
+    finalHeight = rightHeight
+  }
+
+  leftInputRef.value.style.height = finalHeight + 'px';
+  rightInputRef.value.style.height = finalHeight + 'px';
+}
+
+function request() {
+
+  if (inputs.value.left === "") {
+    return
+  }
+
+  isLoading.value = true;
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'elecoxy-key': config.elecoxyKey,
+  };
+
+  axios.post(config.aiProxy + `/openai/deployments/${config.modelVersion}/chat/completions?api-version=${config.apiVersion}`, {
+    temperature: 0,
+    messages: [
+      {
+        "role": "user",
+        "content": prompt.value,
+      }
+    ]
+  }, {headers})
+      .then((response) => {
+        isLoading.value = false
+
+        try {
+          inputs.value.right = response.data['choices'][0]['message']["content"];
+        } catch (e) {
+          alert(response.data)
+        }
+      })
+      .catch((error) => {
+        isLoading.value = false
+        try {
+          const detail = error.response.data['error']['message']
+          alert(detail);
+        } catch (error) {
+          alert(error);
+        }
+      });
+}
+
+function wordCount(str) {
+  return str.split(" ").length;
+}
+
+function cleanBtnTap() {
+  inputs.value.left = "";
+  inputs.value.right = "";
+}
+
+function copyBtnTap() {
+  const content = inputs.value.right
+  navigator.clipboard.writeText(content);
+
+  copyBtnStr.value = "Success";
+
+  setTimeout(function () {
+    copyBtnStr.value = "Copy";
+  }, 400);
+
+}
+
+function translateBtnTap() {
+  if (inputs.value.right.trim() === "") {
+    return;
+  }
+  window.open("https://translate.google.com.hk/?sl=auto&tl=zh-TW&text=" + inputs.value.right + "&op=translate", "_blank")
+}
+
+// Elecoxy Key
+function elecoxyKeyGet() {
+  const tempPassword = $cookies.get('elecoxyKey');
+  config.elecoxyKey = tempPassword === undefined ? "" : tempPassword;
+}
+
+function elecoxyKeySet() {
+  $cookies.set('elecoxyKey', config.elecoxyKey)
+}
+
+// Lifecycle
+watch(inputs, (newValue, oldValue) => {
+  setTimeout(function () {
+    resizeTextarea()
+  }, 100);
+})
+
+onMounted(() => {
+  config.tag = 'language';
+
+  elecoxyKeyGet();
+})
+
+</script>
+
 <template>
   <div style="background-color: #fafafa; padding-bottom: 35px">
     <div class="container py-3 px-3">
       <div class="buttons">
-        <button :class="['button', isGrammar ? 'is-link' : '']" style="font-size: 0.8rem; font-weight: bold" @click="isGrammar = true"><i class="bi bi-spellcheck"
-                                                                                       style="margin-right: 5px; font-size: 1rem"></i>Grammar
-          ( {{ grammarVersion }} )
+        <button :class="['button', isGrammar ? 'is-link' : '']" style="font-size: 0.8rem; font-weight: bold"
+                @click="isGrammar = true"><i class="bi bi-spellcheck"
+                                             style="margin-right: 5px; font-size: 1rem"></i>Grammar
+          ( {{ config.languageVersion.grammar }} )
         </button>
-        <button :class="['button', isGrammar ? '' : 'is-link']" style="font-size: 0.8rem; font-weight: bold" @click="isGrammar = false"><i class="bi bi-spellcheck"
-                                                                                       style="margin-right: 5px; font-size: 1rem"></i>Translate
-          ( {{ translateVersion }} )
+        <button :class="['button', isGrammar ? '' : 'is-link']" style="font-size: 0.8rem; font-weight: bold"
+                @click="isGrammar = false"><i class="bi bi-spellcheck"
+                                              style="margin-right: 5px; font-size: 1rem"></i>Translate
+          ( {{ config.languageVersion.translate }} )
         </button>
       </div>
       <div class="columns is-multiline is-mobile mt-3 mx-0 mb-2">
         <h1 class="column is-full p-0 mb-2" style="font-weight: bold">Elecoxy Key</h1>
-        <input class="column is-6 systemMessage" v-model="elecoxyKey" placeholder="Please input the elecoxy key" type="password" @change="elecoxyKeySet">
+        <input class="column is-6 systemMessage" v-model="config.elecoxyKey" placeholder="Please input the elecoxy key"
+               type="password" @change="elecoxyKeySet">
       </div>
     </div>
   </div>
@@ -30,7 +191,7 @@
           </div>
           <div class="column is-full p-5"
                style="border-top: 1px solid #cbcbcb; border-right: 1px solid #cbcbcb">
-            <textarea @input="resizeTextarea" v-model="leftInput" placeholder="Input" ref="leftInputRef"
+            <textarea @input="resizeTextarea" v-model="inputs.left" placeholder="Input" ref="leftInputRef"
                       :disabled="isLoading"></textarea>
           </div>
           <div class="column is-full has-text-right"
@@ -66,7 +227,7 @@
             </div>
           </div>
           <div class="column is-full p-5" style="border-top: 1px solid #cbcbcb;">
-            <textarea v-model="rightInput" placeholder="Output" ref="rightInputRef"></textarea>
+            <textarea v-model="inputs.right" placeholder="Output" ref="rightInputRef"></textarea>
           </div>
           <div class="column is-full has-text-right"
                style="border-top: 1px solid #cbcbcb;border-bottom: 1px solid #cbcbcb; border-right: 1px solid #cbcbcb; margin-bottom: -1px">
@@ -87,183 +248,6 @@
   </div>
 
 </template>
-
-<script>
-import axios from "axios";
-import {store} from "@/data/store";
-import {Base64} from "js-base64";
-
-export default {
-  name: "LanguageView",
-  data() {
-    return {
-      store,
-
-      grammarVersion: '1.5.0',
-      translateVersion: '1.0.0',
-
-      elecoxyKey: "",
-
-      leftInput: '',
-      rightInput: '',
-
-      isLoading: false,
-
-      copyBtnStr: "Copy",
-
-      isGrammar: true,
-
-      translationPrompt: "I want you to act as an English translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in English. I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, upper level English words and sentences. Keep the meaning same, but make them more literary. I want you to only reply the correction, the improvements and nothing else, do not write explanations.\n",
-
-      grammarPrompt: "Proofread and correct the below text and rewrite " +
-          "the corrected version, the text was delimited with " +
-          "triple backticks. If you don't find any errors, " +
-          "just response the original text. You only response " +
-          "the correct result without any other description. " +
-          "\n" +
-          "After reply the result, check the content by the below steps:\n" +
-          "Step-1: Don't use triple backticks around the text.\n" +
-          "Step-2: Don't use conversation tune to response.\n"
-    }
-  },
-  watch: {
-    leftInput() {
-      const self = this
-      setTimeout(function () {
-        self.resizeTextarea()
-      }, 100);
-    },
-
-    rightInput() {
-      const self = this
-      setTimeout(function () {
-        self.resizeTextarea()
-      }, 100);
-    }
-  },
-  computed: {
-    prompt() {
-      let prompt = ""
-      if (this.isGrammar) {
-        prompt = this.grammarPrompt
-      } else {
-        prompt = this.translationPrompt
-      }
-
-      return prompt + "\n" +
-          "Text: ```" + this.leftInput + "```"
-    }
-  },
-  mounted() {
-    this.store.tag = 'language';
-
-    this.elecoxyKeyGet();
-  },
-  methods: {
-    resizeTextarea() {
-      this.$refs.leftInputRef.style.height = 0 + 'px';
-      this.$refs.rightInputRef.style.height = 0 + 'px';
-
-      let leftHeight = this.$refs.leftInputRef.scrollHeight;
-      let rightHeight = this.$refs.rightInputRef.scrollHeight;
-
-      let finalHeight;
-      if (leftHeight >= rightHeight) {
-        finalHeight = leftHeight
-      } else {
-        finalHeight = rightHeight
-      }
-
-      this.$refs.leftInputRef.style.height = finalHeight + 'px';
-      this.$refs.rightInputRef.style.height = finalHeight + 'px';
-    },
-
-    request() {
-
-      if (this.leftInput === "") {
-        return
-      }
-
-      this.isLoading = true;
-
-      let prompt = this.prompt;
-
-      const headers = {
-        'Content-Type': 'application/json',
-        'elecoxy-key': this.elecoxyKey,
-      };
-
-      axios.post(this.store.aiProxy + `/openai/deployments/${store.modelVersion}/chat/completions?api-version=${store.apiVersion}`, {
-        temperature: 0,
-        messages: [
-          {
-            "role": "user",
-            "content": prompt,
-          }
-        ]
-      }, {headers})
-          .then((response) => {
-            this.isLoading = false
-
-            try {
-              this.rightInput = response.data['choices'][0]['message']["content"];
-            } catch (e) {
-              alert(response.data)
-            }
-          })
-          .catch((error) => {
-            this.isLoading = false
-            try {
-              const detail = error.response.data['error']['message']
-              alert(detail);
-            } catch (error) {
-              alert(error);
-            }
-          });
-    },
-
-    wordCount(str) {
-      return str.split(" ").length;
-    },
-
-    cleanBtnTap() {
-      this.rightInput = ""
-      this.leftInput = ""
-    },
-
-    copyBtnTap() {
-      const content = this.rightInput
-      navigator.clipboard.writeText(content);
-
-      this.copyBtnStr = "Success";
-
-      const self = this
-      setTimeout(function () {
-        self.copyBtnStr = "Copy";
-      }, 400);
-
-    },
-
-    translateBtnTap() {
-      if (this.rightInput.trim() === "") {
-        return;
-      }
-      window.open("https://translate.google.com.hk/?sl=auto&tl=zh-TW&text=" + this.rightInput + "&op=translate", "_blank")
-    },
-
-    elecoxyKeyGet() {
-      const tempPassword = this.$cookies.get('elecoxyKey');
-      this.elecoxyKey = tempPassword === undefined ? "" : tempPassword;
-
-      return this.elecoxyKey;
-    },
-
-    elecoxyKeySet() {
-      this.$cookies.set('elecoxyKey', this.elecoxyKey)
-    }
-  }
-}
-</script>
 
 <style lang="scss" scoped>
 .canvas {

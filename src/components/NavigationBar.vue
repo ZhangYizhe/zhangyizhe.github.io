@@ -1,3 +1,14 @@
+<script setup>
+import { useConfigStore } from "@/data/useConfigStore";
+import {computed} from "vue";
+
+const config = useConfigStore()
+
+const tag = computed(() => config.tag)
+const isExpended = computed(() => config.isExpended)
+
+</script>
+
 <template>
     <div class="navigationBar">
         <div class="container">
@@ -8,7 +19,7 @@
                     </a>
 
                     <a role="button" :class="['navbar-burger', isExpended ? 'is-active' : '']" aria-label="menu"
-                       aria-expanded="false" @click="store.isExpended = !store.isExpended">
+                       aria-expanded="false" @click="config.isExpended = !config.isExpended">
                         <span aria-hidden="true"></span>
                         <span aria-hidden="true"></span>
                         <span aria-hidden="true"></span>
@@ -44,26 +55,6 @@
     </div>
 </template>
 
-<script>
-import {store} from "@/data/store";
-
-export default {
-    name: "NavigationBar",
-    data() {
-        return {
-            store
-        }
-    },
-  computed: {
-    tag() {
-      return store.tag
-    },
-    isExpended() {
-      return store.isExpended
-    },
-  }
-}
-</script>
 
 <style scoped>
 

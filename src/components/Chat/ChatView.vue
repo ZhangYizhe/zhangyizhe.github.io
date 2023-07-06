@@ -1,5 +1,202 @@
+<script setup>
+import { useConfigStore } from "@/data/useConfigStore";
+import { fetchEventSource } from "@microsoft/fetch-event-source"
+import {onMounted, ref, watch} from "vue";
+
+const config = useConfigStore();
+
+const systemMessages = ref({
+  role: "system",
+  content: "",
+})
+
+const recordsNum = ref(20)
+
+const tempMessage = ref("")
+const messages = ref([])
+const storageMessages = ref([])
+
+const inputTextareaRef = ref(null)
+const inputText = ref("")
+
+const isLoading = ref(false)
+
+// Message
+function sendBtnTap(e) {
+
+  const textTrim = inputText.value.trim();
+
+  if (textTrim === '') {
+    return;
+  }
+
+  addNewMessage({
+    "role": "user",
+    "content": textTrim
+  })
+
+  scrollToBottom();
+
+  inputText.value = "";
+
+  request();
+}
+
+async function request() {
+
+  isLoading.value = true;
+
+  await fetchEventSource(config.aiProxy + `/openai/deployments/${config.modelVersion}/chat/completions?api-version=${config.apiVersion}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'elecoxy-key': config.elecoxyKey,
+    },
+    body: JSON.stringify({
+      messages: [systemMessages.value, ...storageMessages.value],
+      stream: true,
+    }),
+    async onopen(response) {
+      if (response.status === 200) {
+        tempMessage.value = "";
+        return;
+      }
+
+      switch (response.status) {
+        case 201 :
+          alert(`Error Code: ${response.status}, invalid Elecoxy key.`);
+          break;
+        case 401 :
+          alert(`Error Code: ${response.status}, invalid Authentication.`);
+          break;
+        case 403 :
+          alert(`Error Code: ${response.status}, invalid Elecoxy Authentication, please try again later.`);
+          break;
+        case 429 :
+          alert(`Error Code: ${response.status}, rate limit reached for requests, please try again later.`);
+          break;
+        case 500 :
+          alert(`Error Code: ${response.status}, the server had an error while processing your request, please try again later.`);
+          break;
+        default:
+          alert(`Error Code: ${response.status}, please try again later.`);
+          break;
+      }
+    },
+    onmessage(msg) {
+      const data = JSON.parse(msg.data);
+      const delta = data.choices[0].delta;
+      const finish_reason = data.choices[0].finish_reason;
+
+      if (finish_reason !== null) {
+        const stopMessage = {
+          "role": "assistant",
+          "content": tempMessage.value
+        }
+
+        isLoading.value = false;
+        tempMessage.value = "";
+
+        messages.value.push(stopMessage);
+        storageMessages.value.push(stopMessage);
+        return;
+      }
+
+      if (delta['content'] !== undefined) {
+        tempMessage.value += delta["content"];
+        scrollToBottomWithoutTimer();
+      }
+    },
+    onclose() {
+
+    },
+    onerror(err) {
+      isLoading.value = false;
+      tempMessage.value = "";
+      throw err;
+    }
+  })
+  isLoading.value = false;
+}
+
+function addNewMessage(content) {
+  if (recordsNum.value > 50) {
+    alert('對話輪次數太大！')
+    return;
+  }
+
+  if (storageMessages.value.length > (recordsNum.value * 2)) {
+    storageMessages.value.splice(0, 2);
+  }
+
+  storageMessages.value.push(content)
+  messages.value.push(content)
+}
+
+// Textarea
+function resizeTextarea() {
+  inputTextareaRef.value.style.height = 0 + 'px';
+
+  let inputHeight = inputTextareaRef.value.scrollHeight;
+
+  if (inputHeight > 300) {
+    inputHeight = 300;
+  }
+
+  inputTextareaRef.value.style.height = inputHeight + 'px';
+}
+
+function resetConversation() {
+  messages.value = []
+  storageMessages.value = JSON.parse(JSON.stringify(messages.value))
+  inputText.value = ''
+
+  resizeTextarea()
+}
+
+// Canvas Scroll
+const mainCanvasRef = ref(null)
+function scrollToBottom() {
+  setTimeout(function () {
+    const el = mainCanvasRef;
+    el.scrollTop = el.scrollHeight;
+  }, 100)
+}
+
+function scrollToBottomWithoutTimer() {
+  const el = mainCanvasRef;
+  el.scrollTop = el.scrollHeight;
+}
+
+// Elecoxy Key
+function elecoxyKeyGet() {
+  const tempPassword = $cookies.get('elecoxyKey');
+  config.elecoxyKey = tempPassword === undefined ? "" : tempPassword;
+}
+
+function elecoxyKeySet() {
+  $cookies.set('elecoxyKey', config.elecoxyKey)
+}
+
+// Lifecycle
+watch(inputText, async (newValue, oldValue) => {
+  setTimeout(function () {
+    resizeTextarea()
+  }, 10);
+})
+
+onMounted(() => {
+  config.tag = 'chat';
+
+  elecoxyKeyGet();
+
+  resetConversation();
+})
+
+</script>
+
 <template>
-  <div class="canvas" ref="canvas">
+  <div class="canvas" ref="mainCanvasRef">
     <div class="columns is-multiline m-0">
 
       <div :class="['column is-full cal-basic', systemMessages.role === 'user' ? 'cal-user' : 'cal-assistant' ]">
@@ -23,7 +220,7 @@
                   </div>
                   <div class="columns is-multiline is-mobile">
                     <h1 class="column is-full" style="padding-left: 0; font-weight: bold">Elecoxy Key</h1>
-                    <input class="column systemMessage" v-model="elecoxyKey" placeholder="Please input the elecoxy key" type="password" @change="elecoxyKeySet">
+                    <input class="column systemMessage" v-model="config.elecoxyKey" placeholder="Please input the elecoxy key" type="password" @change="elecoxyKeySet">
                   </div>
                 </div>
               </div>
@@ -86,7 +283,7 @@
   <div :class="['inputView', isLoading ? 'inputView-disabled' : '']">
     <div class="columns is-gapless is-mobile">
       <div class="column">
-        <textarea v-model="inputText" placeholder="說點什麼吧" ref="inputRef"
+        <textarea v-model="inputText" placeholder="說點什麼吧" ref="inputTextareaRef"
                   :disabled="isLoading"></textarea>
 
           <!--  @keyup.enter.exact="sendBtnTap"-->
@@ -102,231 +299,6 @@
   </div>
 
 </template>
-
-<script>
-import axios from "axios";
-import {store} from "@/data/store";
-import {Base64} from "js-base64";
-import { fetchEventSource } from "@microsoft/fetch-event-source"
-
-export default {
-  name: "ChatView",
-  components: {},
-  data() {
-    return {
-      store,
-
-      elecoxyKey: "",
-
-      systemMessages: {
-        role: "system",
-        content: "",
-      },
-
-      recordsNum: 20,
-
-      tempMessage: "",
-      messages: [],
-      storageMessages: [],
-
-      inputText: '',
-
-      isLoading: false,
-
-      alert: {
-        title: "",
-        content: ""
-      }
-    }
-  },
-  computed: {
-    token() {
-      return "";
-    }
-  },
-  mounted() {
-    this.store.tag = 'chat';
-
-    this.elecoxyKeyGet();
-
-    this.resetConversation();
-  },
-  watch: {
-    inputText() {
-      const self = this
-      setTimeout(function () {
-        self.resizeTextarea()
-      }, 10);
-    },
-  },
-  methods: {
-
-    resizeTextarea() {
-      this.$refs.inputRef.style.height = 0 + 'px';
-
-      var inputHeight = this.$refs.inputRef.scrollHeight;
-
-      if (inputHeight > 300) {
-        inputHeight = 300;
-      }
-
-      this.$refs.inputRef.style.height = inputHeight + 'px';
-    },
-
-    resetConversation() {
-
-      this.messages = [
-
-      ]
-
-      this.storageMessages = JSON.parse(JSON.stringify(this.messages))
-
-      this.inputText = ''
-      this.resizeTextarea()
-    },
-
-    sendBtnTap(e) {
-
-      const textTrim = this.inputText.trim();
-
-      if (textTrim === '') {
-        return;
-      }
-
-      this.addNewMessage({
-        "role": "user",
-        "content": textTrim
-      })
-
-      this.scrollToBottom();
-
-      this.inputText = "";
-
-      this.request();
-    },
-
-    async request() {
-
-      this.isLoading = true;
-      const subThis = this;
-
-      await fetchEventSource(this.store.aiProxy + `/openai/deployments/${store.modelVersion}/chat/completions?api-version=${store.apiVersion}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'elecoxy-key': this.elecoxyKey,
-        },
-        body: JSON.stringify({
-          messages: [this.systemMessages, ...this.storageMessages],
-          stream: true,
-        }),
-        async onopen(response) {
-          if (response.status === 200) {
-            subThis.tempMessage = "";
-            return;
-          }
-
-          switch (response.status) {
-            case 201 :
-              alert(`Error Code: ${response.status}, invalid Elecoxy key.`);
-              break;
-            case 401 :
-              alert(`Error Code: ${response.status}, invalid Authentication.`);
-              break;
-            case 403 :
-              alert(`Error Code: ${response.status}, invalid Elecoxy Authentication, please try again later.`);
-              break;
-            case 429 :
-              alert(`Error Code: ${response.status}, rate limit reached for requests, please try again later.`);
-              break;
-            case 500 :
-              alert(`Error Code: ${response.status}, the server had an error while processing your request, please try again later.`);
-              break;
-            default:
-              alert(`Error Code: ${response.status}, please try again later.`);
-              break;
-          }
-        },
-        onmessage(msg) {
-          const data = JSON.parse(msg.data);
-          const delta = data.choices[0].delta;
-          const finish_reason = data.choices[0].finish_reason;
-
-          if (finish_reason !== null) {
-            const stopMessage = {
-              "role": "assistant",
-              "content": subThis.tempMessage
-            }
-
-            subThis.isLoading = false;
-            subThis.tempMessage = "";
-
-            subThis.messages.push(stopMessage);
-            subThis.storageMessages.push(stopMessage);
-            return;
-          }
-
-          if (delta['content'] !== undefined) {
-            subThis.tempMessage += delta["content"];
-            subThis.scrollToBottomWithoutTimer();
-          }
-        },
-        onclose() {
-
-        },
-        onerror(err) {
-          subThis.isLoading = false;
-          subThis.tempMessage = "";
-          throw err;
-        }
-      })
-
-      this.isLoading = false;
-
-    },
-
-    addNewMessage(content) {
-      if (this.recordsNum > 50) {
-        alert('對話輪次數太大！')
-        return;
-      }
-
-      if (this.storageMessages.length > (this.recordsNum * 2)) {
-        this.storageMessages.splice(0, 2);
-      }
-
-      this.storageMessages.push(content)
-      this.messages.push(content)
-    },
-
-    scrollToBottom() {
-      self = this;
-
-      setTimeout(function () {
-        const el = self.$refs.canvas;
-        el.scrollTop = el.scrollHeight;
-      }, 100)
-    },
-
-    scrollToBottomWithoutTimer() {
-      const el = this.$refs.canvas;
-      el.scrollTop = el.scrollHeight;
-    },
-
-    elecoxyKeyGet() {
-      const tempPassword = this.$cookies.get('elecoxyKey');
-      this.elecoxyKey = tempPassword === undefined ? "" : tempPassword;
-
-      return this.elecoxyKey;
-    },
-
-    elecoxyKeySet() {
-      this.$cookies.set('elecoxyKey', this.elecoxyKey)
-    }
-
-  }
-}
-</script>
 
 <style lang="scss" scoped>
 .canvas {

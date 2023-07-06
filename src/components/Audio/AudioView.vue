@@ -32,7 +32,7 @@
 <script>
 import axios from "axios";
 import {Base64} from "js-base64";
-import {store} from "@/data/store";
+import {store} from "@/data/useConfigStore";
 
 var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
