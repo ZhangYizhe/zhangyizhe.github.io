@@ -251,7 +251,8 @@ onMounted(() => {
                          alt="">
                   </div>
 
-                  <div class="column" v-html="message.content">
+                  <div class="column message">
+                    <span v-html="message.content"></span>
                   </div>
                 </div>
               </div>
