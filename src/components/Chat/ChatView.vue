@@ -14,7 +14,6 @@ const recordsNum = ref(20)
 
 const tempMessage = ref("")
 const messages = ref([])
-const storageMessages = ref([])
 
 const inputTextareaRef = ref(null)
 const inputText = ref("")
@@ -42,6 +41,14 @@ function sendBtnTap(e) {
   request();
 }
 
+function reComposeBtnTap(index) {
+  messages.value = messages.value.slice(0, index);
+
+  scrollToBottom();
+
+  request();
+}
+
 async function request() {
 
   isLoading.value = true;
@@ -53,7 +60,7 @@ async function request() {
       'elecoxy-key': config.elecoxyKey,
     },
     body: JSON.stringify({
-      messages: [systemMessages.value, ...storageMessages.value],
+      messages: [systemMessages.value, ...messages.value],
       stream: true,
     }),
     async onopen(response) {
@@ -98,7 +105,6 @@ async function request() {
         tempMessage.value = "";
 
         messages.value.push(stopMessage);
-        storageMessages.value.push(stopMessage);
         return;
       }
 
@@ -125,11 +131,11 @@ function addNewMessage(content) {
     return;
   }
 
-  if (storageMessages.value.length > (recordsNum.value * 2)) {
-    storageMessages.value.splice(0, 2);
+  if (messages.value.length > (recordsNum.value * 2)) {
+    alert('已達到最大對話輪次。');
+    return;
   }
 
-  storageMessages.value.push(content)
   messages.value.push(content)
 }
 
@@ -148,7 +154,6 @@ function resizeTextarea() {
 
 function resetConversation() {
   messages.value = []
-  storageMessages.value = JSON.parse(JSON.stringify(messages.value))
   inputText.value = ''
 
   resizeTextarea()
@@ -230,22 +235,29 @@ onMounted(() => {
       </div>
 
 
-      <template v-for="message in messages">
+      <template v-for="(message, index) in messages">
         <div v-if="message.role !== 'system'"
              :class="['column is-full cal-basic', message.role === 'user' ? 'cal-user' : 'cal-assistant' ]">
           <div class="container is-max-desktop">
             <div class="columns is-multiline">
               <div class="column">
-                <div class="columns is-mobile">
+                <div class="columns is-mobile" style="overflow: hidden">
                   <div class="column is-narrow">
                     <img v-if="message.role !== 'user'" src="/public/img/chat/robot.png" class="shadow-sm"
                          style="width: 45px; height: 45px; border-radius: 4px; margin-right: 10px; background-color: white; padding: 2px"
                          alt="">
                     <img v-else src="/public/img/chat/laptop.png" class="shadow-sm"
-                         style="width: 45px; height: 45px; border-radius: 4px; margin-right: 10px; background-color: white; padding: 2px"
+                         style="width: 45px; height: 45px; border-radius: 4px; margin-right: 10px; background-color: white; padding: 2px;"
                          alt="">
                   </div>
-                  <div class="column message" v-html="message.content"></div>
+
+                  <div class="column" v-html="message.content">
+                  </div>
+                </div>
+              </div>
+              <div class="column is-narrow" v-if="message.role === 'assistant'">
+                <div style="padding: 4px; border: 1px solid lightgrey; border-radius: 4px; cursor: pointer" @click="reComposeBtnTap(index)">
+                  <i class="bi bi-arrow-clockwise"></i>
                 </div>
               </div>
             </div>
@@ -324,7 +336,6 @@ onMounted(() => {
   white-space: pre-line;
   line-height: 25px;
   background-color: transparent;
-  margin-top: 10px;
 }
 
 .cal-user {
