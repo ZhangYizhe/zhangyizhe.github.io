@@ -158,13 +158,13 @@ function resetConversation() {
 const mainCanvasRef = ref(null)
 function scrollToBottom() {
   setTimeout(function () {
-    const el = mainCanvasRef;
+    const el = mainCanvasRef.value;
     el.scrollTop = el.scrollHeight;
   }, 100)
 }
 
 function scrollToBottomWithoutTimer() {
-  const el = mainCanvasRef;
+  const el = mainCanvasRef.value;
   el.scrollTop = el.scrollHeight;
 }
 
