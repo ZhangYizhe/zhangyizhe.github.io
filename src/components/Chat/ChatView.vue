@@ -31,7 +31,7 @@ function sendBtnTap(e) {
 
   addNewMessage({
     "role": "user",
-    "content": textTrim
+    "content": textTrim.replaceAll("\n", "<br />")
   })
 
   scrollToBottom();
@@ -98,7 +98,7 @@ async function request() {
       if (finish_reason !== null) {
         const stopMessage = {
           "role": "assistant",
-          "content": tempMessage.value
+          "content": tempMessage.value.replaceAll("\n", "<br />")
         }
 
         isLoading.value = false;
@@ -251,8 +251,8 @@ onMounted(() => {
                          alt="">
                   </div>
 
-                  <div class="column message">
-                    <span v-html="message.content"></span>
+                  <div class="column message" v-html=" message.content">
+
                   </div>
                 </div>
               </div>
@@ -281,7 +281,6 @@ onMounted(() => {
 
                   </span>
                   <span class='blinking-cursor'>▋</span>
-
                 </div>
               </div>
             </div>
