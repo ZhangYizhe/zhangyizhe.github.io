@@ -53,11 +53,11 @@ async function request() {
 
   isLoading.value = true;
 
-  await fetchEventSource(config.aiProxy + `/openai/deployments/${config.modelVersion}/chat/completions?api-version=${config.apiVersion}`, {
+  await fetchEventSource(config.azureUrl + `/openai/deployments/${config.modelVersion}/chat/completions?api-version=${config.apiVersion}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'elecoxy-key': config.elecoxyKey,
+      'api-key': config.azureKey,
     },
     body: JSON.stringify({
       messages: [systemMessages.value, ...messages.value],
@@ -169,21 +169,25 @@ function scrollToBottom() {
 }
 
 function scrollToBottomWithoutTimer() {
-  const el = mainCanvasRef.value;
-  el.scrollTop = el.scrollHeight;
+  nextTick(() => {
+    const el = mainCanvasRef.value;
+    el.scrollTop = el.scrollHeight;
+  })
 }
 
-// Elecoxy Key
-function elecoxyKeyGet() {
-  const tempPassword = $cookies.get('elecoxyKey');
-  config.elecoxyKey = tempPassword === undefined ? "" : tempPassword;
-}
-
-function elecoxyKeySet() {
-  $cookies.set('elecoxyKey', config.elecoxyKey)
+async function azureKeySet(force = false) {
+  isLoading.value = true;
+  await config.setAzureKey(force);
+  isLoading.value = false;
 }
 
 // Lifecycle
+watch(() => config.elecoxyKey, async (newValue, oldValue) => {
+  await nextTick(() => {
+    azureKeySet(true);
+  })
+})
+
 watch(inputText, async (newValue, oldValue) => {
   await nextTick(() => {
     resizeTextarea()
@@ -193,9 +197,9 @@ watch(inputText, async (newValue, oldValue) => {
 onMounted(() => {
   config.tag = 'chat';
 
-  elecoxyKeyGet();
-
   resetConversation();
+
+  azureKeySet();
 })
 
 </script>
@@ -225,7 +229,7 @@ onMounted(() => {
                   </div>
                   <div class="columns is-multiline is-mobile">
                     <h1 class="column is-full" style="padding-left: 0; font-weight: bold">Elecoxy Key</h1>
-                    <input class="column systemMessage" v-model="config.elecoxyKey" placeholder="Please input the elecoxy key" type="password" @change="elecoxyKeySet">
+                    <input class="column systemMessage" :value="config.elecoxyKey" placeholder="Please input the elecoxy key" type="password" @change="config.elecoxyKey = $event.target.value">
                   </div>
                 </div>
               </div>

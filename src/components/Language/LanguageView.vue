@@ -63,7 +63,7 @@ function resizeTextarea() {
 
 function request() {
 
-  if (inputs.left === "") {
+  if (inputs.left === "" || isLoading.value === true) {
     return
   }
 
@@ -71,10 +71,10 @@ function request() {
 
   const headers = {
     'Content-Type': 'application/json',
-    'elecoxy-key': config.elecoxyKey,
+    'api-key': config.azureKey,
   };
 
-  axios.post(config.aiProxy + `/openai/deployments/${config.modelVersion}/chat/completions?api-version=${config.apiVersion}`, {
+  axios.post(config.azureUrl + `/openai/deployments/${config.modelVersion}/chat/completions?api-version=${config.apiVersion}`, {
     temperature: 0,
     messages: [
       {
@@ -100,7 +100,7 @@ function request() {
         try {
           const detail = error.response.data['error']['message']
           alert(detail);
-        } catch (error) {
+        } catch (_) {
           alert(error);
         }
       });
@@ -138,17 +138,19 @@ function translateBtnTap() {
   window.open("https://translate.google.com.hk/?sl=auto&tl=zh-TW&text=" + inputs.right + "&op=translate", "_blank")
 }
 
-// Elecoxy Key
-function elecoxyKeyGet() {
-  const tempPassword = $cookies.get('elecoxyKey');
-  config.elecoxyKey = tempPassword === undefined ? "" : tempPassword;
-}
-
-function elecoxyKeySet() {
-  $cookies.set('elecoxyKey', config.elecoxyKey)
+async function azureKeySet(force = false) {
+  isLoading.value = true;
+  await config.setAzureKey(force);
+  isLoading.value = false;
 }
 
 // Lifecycle
+watch(() => config.elecoxyKey, async (newValue, oldValue) => {
+  await nextTick(() => {
+    azureKeySet(true);
+  })
+})
+
 watch(inputs,(newValue, oldValue) => {
       resizeTextarea()
 })
@@ -156,7 +158,7 @@ watch(inputs,(newValue, oldValue) => {
 onMounted(() => {
   config.tag = 'language';
 
-  elecoxyKeyGet();
+  azureKeySet();
 })
 
 </script>
@@ -178,8 +180,8 @@ onMounted(() => {
       </div>
       <div class="columns is-multiline is-mobile mt-3 mx-0 mb-2">
         <h1 class="column is-full p-0 mb-2" style="font-weight: bold">Elecoxy Key</h1>
-        <input class="column is-6 systemMessage" v-model="config.elecoxyKey" placeholder="Please input the elecoxy key"
-               type="password" @change="elecoxyKeySet">
+        <input class="column is-6 systemMessage" :value="config.elecoxyKey" placeholder="Please input the elecoxy key"
+               type="password" @change="config.elecoxyKey = $event.target.value">
       </div>
     </div>
   </div>
