@@ -12,8 +12,8 @@ export const useConfigStore= defineStore('config',{
         elecoxyKey: '',
 
         languageVersion: {
-            grammar: '1.6.0',
-            translate: '1.1.0',
+            grammar: '1.7.0',
+            translate: '1.2.0',
         }
     })
 })

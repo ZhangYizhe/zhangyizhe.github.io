@@ -1,7 +1,7 @@
 <script setup>
 import { useConfigStore } from "@/data/useConfigStore";
 import { fetchEventSource } from "@microsoft/fetch-event-source"
-import {onMounted, ref, watch} from "vue";
+import {nextTick, onMounted, ref, watch} from "vue";
 
 const config = useConfigStore();
 
@@ -162,10 +162,10 @@ function resetConversation() {
 // Canvas Scroll
 const mainCanvasRef = ref(null)
 function scrollToBottom() {
-  setTimeout(function () {
+  nextTick(() => {
     const el = mainCanvasRef.value;
     el.scrollTop = el.scrollHeight;
-  }, 100)
+  })
 }
 
 function scrollToBottomWithoutTimer() {
@@ -185,9 +185,9 @@ function elecoxyKeySet() {
 
 // Lifecycle
 watch(inputText, async (newValue, oldValue) => {
-  setTimeout(function () {
+  await nextTick(() => {
     resizeTextarea()
-  }, 10);
+  })
 })
 
 onMounted(() => {

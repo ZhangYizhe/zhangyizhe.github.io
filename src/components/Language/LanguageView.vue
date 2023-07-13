@@ -1,11 +1,11 @@
 <script setup>
 import { useConfigStore } from "@/data/useConfigStore";
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, nextTick, onMounted, reactive, ref, watch} from "vue";
 import axios from "axios";
 
 const config = useConfigStore();
 
-const inputs = ref({
+const inputs = reactive({
   left: '',
   right: '',
 })
@@ -40,7 +40,7 @@ const prompt = computed(() => {
   }
 
   return prompt + "\n" +
-      "Text: ```" + inputs.value.left + "```"
+      "Text: ```" + inputs.left + "```"
 })
 
 function resizeTextarea() {
@@ -63,7 +63,7 @@ function resizeTextarea() {
 
 function request() {
 
-  if (inputs.value.left === "") {
+  if (inputs.left === "") {
     return
   }
 
@@ -87,7 +87,10 @@ function request() {
         isLoading.value = false
 
         try {
-          inputs.value.right = response.data['choices'][0]['message']["content"];
+          inputs.right = response.data['choices'][0]['message']["content"];
+          nextTick(() => {
+            resizeTextarea()
+          })
         } catch (e) {
           alert(response.data)
         }
@@ -108,27 +111,31 @@ function wordCount(str) {
 }
 
 function cleanBtnTap() {
-  inputs.value.left = "";
-  inputs.value.right = "";
+  inputs.left = "";
+  inputs.right = "";
+
+  nextTick(() => {
+    resizeTextarea()
+  })
 }
 
 function copyBtnTap() {
-  const content = inputs.value.right
+  const content = inputs.right
   navigator.clipboard.writeText(content);
 
   copyBtnStr.value = "Success";
 
-  setTimeout(function () {
+  nextTick(() => {
     copyBtnStr.value = "Copy";
-  }, 400);
+  })
 
 }
 
 function translateBtnTap() {
-  if (inputs.value.right.trim() === "") {
+  if (inputs.right.trim() === "") {
     return;
   }
-  window.open("https://translate.google.com.hk/?sl=auto&tl=zh-TW&text=" + inputs.value.right + "&op=translate", "_blank")
+  window.open("https://translate.google.com.hk/?sl=auto&tl=zh-TW&text=" + inputs.right + "&op=translate", "_blank")
 }
 
 // Elecoxy Key
@@ -142,10 +149,8 @@ function elecoxyKeySet() {
 }
 
 // Lifecycle
-watch(inputs, (newValue, oldValue) => {
-  setTimeout(function () {
-    resizeTextarea()
-  }, 100);
+watch(inputs,(newValue, oldValue) => {
+      resizeTextarea()
 })
 
 onMounted(() => {
@@ -191,7 +196,7 @@ onMounted(() => {
           </div>
           <div class="column is-full p-5"
                style="border-top: 1px solid #cbcbcb; border-right: 1px solid #cbcbcb">
-            <textarea @input="resizeTextarea" v-model="inputs.left" placeholder="Input" ref="leftInputRef"
+            <textarea v-model="inputs.left" placeholder="Input" ref="leftInputRef"
                       :disabled="isLoading"></textarea>
           </div>
           <div class="column is-full has-text-right"
