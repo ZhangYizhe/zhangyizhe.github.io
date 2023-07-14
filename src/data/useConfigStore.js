@@ -11,6 +11,7 @@ export const useConfigStore= defineStore('config',{
                 azureKey: null,
                 azureUrl: null,
                 elecoxyKey: null,
+                azureSpeech: null,
             }
     },
 
@@ -35,6 +36,7 @@ export const useConfigStore= defineStore('config',{
                 if (docSnap.exists()) {
                     this.azureKey = docSnap.data().azureKey;
                     this.azureUrl = docSnap.data().azureUrl;
+                    this.azureSpeech = docSnap.data().azureSpeech;
                 } else {
                     this.azureKey = null;
                 }
