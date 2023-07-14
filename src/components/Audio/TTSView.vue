@@ -1,46 +1,64 @@
 <script setup>
 import { useConfigStore } from "@/data/useConfigStore";
+import { useTTSStore } from "@/data/useTTSStore";
 import {nextTick, onMounted, ref, watch} from "vue";
-import { useAVBars } from 'vue-audio-visual'
+import {useAVBars} from 'vue-audio-visual'
+import axios from "axios";
 
 const config = useConfigStore();
+const ttsStore = useTTSStore();
 
 const isLoading = ref(false);
 
-const inputStr = ref('')
-
 const ttsInputRef = ref(null);
 
-// Audio
-const player = ref(null)
-const isPlaying = ref(false);
-const lastTime = ref("--:--");
-const canvas = ref(null)
-const mySource = "public/audios/東方之珠.mp3"
+// TTS
+async function ttsBtnTap() {
+  audioStopBtnTap();
 
-// composable function useAVBars
-initAudioCanvas()
-
-function initAudioCanvas() {
-  nextTick(() => {
-    useAVBars(player, canvas, { canvFillColor: "black", canvHeight: 60, canvWidth: 240, barWidth:2, barSpace: 2, barColor: ['#FFF'], symmetric: true})
-  })
-}
-
-function audioPlayBtnTap() {
-  if (!isPlaying.value) {
-    player.value.play();
-  } else {
-    player.value.currentTime = 0;
-    player.value.pause();
+  const _inputStr = ttsStore.lastVoiceStr.trim();
+  if (_inputStr === '') {
+    return;
   }
+  isLoading.value = true;
+
+  const headers = {
+    'Content-Type': 'application/ssml+xml',
+    'Ocp-Apim-Subscription-Key': config.azureSpeech.key,
+    'X-Microsoft-OutputFormat': 'audio-16khz-128kbitrate-mono-mp3',
+  };
+
+  const voice = ttsStore.voiceList[ttsStore.currentVoice]
+
+  let content = "<voice xml:lang='zh-CN' xml:gender='"  + voice.gender + "' name='zh-HK-" + voice.name +"Neural' style='SeniorMale'>" + _inputStr + "</voice>"
+  let requestStr = "<speak version='1.0' xml:lang='zh-HK'>" + content + " </speak>"
+
+  axios.post(config.azureSpeech.url, requestStr, {
+    responseType: 'arraybuffer',
+    headers: headers
+  })
+      .then((response) => {
+        isLoading.value = false
+        const blobUrl = window.URL.createObjectURL(new Blob([response.data], {
+          type: 'audio/mpeg',
+        }));
+        audioSource.value = blobUrl;
+      })
+      .catch((error) => {
+        isLoading.value = false
+        try {
+          const detail = error.response.data['error']['message']
+          alert(detail);
+        } catch (_) {
+          alert(error);
+        }
+      });
 }
 
-function onPlayTimeChange() {
-  const lastSeconds = Math.floor(player.value.duration - player.value.currentTime)
-  const minutes = Math.floor(lastSeconds / 60);
-  const seconds = (lastSeconds - minutes * 60) % 60;
-  lastTime.value = (minutes > 9 ? minutes.toString() : "0" + minutes.toString()) + ":" + (seconds > 9 ? seconds.toString() : "0" + seconds.toString());
+function cleanContentBtnTap() {
+  if (confirm('Are you sure you want to delete all content?')) {
+    ttsStore.$reset()
+  }
 }
 
 function resizeTextarea() {
@@ -51,6 +69,40 @@ function resizeTextarea() {
   })
 }
 
+// Audio
+const player = ref(null)
+const isPlaying = ref(false);
+const lastTime = ref("--:--");
+const canvas = ref(null)
+const audioSource = ref("")
+
+initAudioCanvas()
+function initAudioCanvas() {
+  nextTick(() => {
+    useAVBars(player, canvas, { canvFillColor: "black", canvHeight: 60, canvWidth: 240, barWidth:2, barSpace: 2, barColor: ['#FFF'], symmetric: true})
+  })
+}
+
+function audioPlayBtnTap() {
+  if (!isPlaying.value) {
+    player.value.play();
+  } else {
+    audioStopBtnTap()
+  }
+}
+
+function audioStopBtnTap() {
+  player.value.currentTime = 0;
+  player.value.pause();
+}
+
+function onPlayTimeChange() {
+  const lastSeconds = Math.floor(player.value.duration - player.value.currentTime)
+  const minutes = Math.floor(lastSeconds / 60);
+  const seconds = (lastSeconds - minutes * 60) % 60;
+  lastTime.value = (minutes > 9 ? minutes.toString() : "0" + minutes.toString()) + ":" + (seconds > 9 ? seconds.toString() : "0" + seconds.toString());
+}
+
 onMounted(() => {
   config.tag = 'tts';
 
@@ -58,7 +110,7 @@ onMounted(() => {
   azureKeySet();
 })
 
-watch(inputStr, () => {
+watch(() => ttsStore.lastVoiceStr, () => {
   resizeTextarea()
 })
 
@@ -91,39 +143,51 @@ async function azureKeySet(force = false) {
         <div class="column is-full pt-1">
           <div class="columns is-multiline is-mobile">
             <div class="column is-full m-0 p-0">
-              <audio ref="player" :src="mySource" @playing="isPlaying = true" @pause="isPlaying = false" @timeupdate="onPlayTimeChange" @loadeddata="onPlayTimeChange"/>
+              <audio ref="player" :src="audioSource" @playing="isPlaying = true" @pause="isPlaying = false" @timeupdate="onPlayTimeChange" @loadeddata="onPlayTimeChange"/>
             </div>
             <div class="column is-full py-0">
               <div style="background-color: black; border-radius: 5px; height: 300px">
-                <canvas ref="canvas" style="margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, calc(-50% - 50px));" v-if="isPlaying"/>
+                <canvas ref="canvas" style="margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, calc(-50% - 100px));" v-if="isPlaying"/>
               </div>
             </div>
             <div v-if="player" class="column is-full is-align-items-center is-flex">
               <span class="mr-3 button is-warning" style="min-width: 100px">
                 {{lastTime}}
               </span>
-              <div class="button" @click="audioPlayBtnTap">
+              <button :class="['button', isLoading ? 'is-loading' : '']" @click="audioPlayBtnTap" :disabled="isLoading">
                 <template v-if="!isPlaying">
                   Play
                 </template>
                 <template v-else>
                   Stop
                 </template>
-              </div>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="column">
+          <div class="buttons has-addons">
+            <div :class="['button', voice.id === ttsStore.currentVoice ? 'is-warning' : '']"  @click="ttsStore.currentVoice = voice.id" v-for="voice in ttsStore.voiceList">
+              {{ voice.displayName }} : {{ voice.gender }}
             </div>
           </div>
         </div>
         <div class="column is-full">
           <div class="columns is-vcentered">
             <div class="column">
-              <textarea ref="ttsInputRef" placeholder="Type something here" v-model="inputStr"></textarea>
+              <textarea ref="ttsInputRef" placeholder="Type something here" v-model="ttsStore.lastVoiceStr"></textarea>
             </div>
             <div class="column is-narrow">
-              <div class="button is-warning">
+              <button :class="['button is-warning', isLoading ? 'is-loading' : '']" @click="ttsBtnTap" :disabled="isLoading">
                 Generation
-              </div>
+              </button>
             </div>
           </div>
+        </div>
+        <div class="column is-full pt-0">
+          <button :class="['button is-danger', isLoading ? 'is-loading' : '']" @click="cleanContentBtnTap" :disabled="isLoading">
+            Clear
+          </button>
         </div>
       </div>
     </div>
