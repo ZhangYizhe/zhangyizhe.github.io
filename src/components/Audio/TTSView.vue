@@ -21,6 +21,9 @@ async function ttsBtnTap() {
     return;
   }
   isLoading.value = true;
+  if (config.azureSpeech === null) {
+    await azureKeySet();
+  }
 
   const headers = {
     'Content-Type': 'application/ssml+xml',
