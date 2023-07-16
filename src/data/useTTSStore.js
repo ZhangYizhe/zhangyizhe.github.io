@@ -1,4 +1,8 @@
 import { defineStore } from "pinia";
+import { useConfigStore } from "@/data/useConfigStore";
+import {doc, getDoc} from "firebase/firestore";
+
+const config = useConfigStore();
 
 export const useTTSStore= defineStore('tts',{
     persist: true,
@@ -6,6 +10,7 @@ export const useTTSStore= defineStore('tts',{
         return {
             currentVoice: 0,
             lastVoiceStr: "",
+            azureSpeech: null,
         }
     },
 
@@ -36,6 +41,25 @@ export const useTTSStore= defineStore('tts',{
                     type: "Chinese (Cantonese, Traditional)"
                 }
             ]
+        }
+    },
+
+    actions: {
+        async setTTSAzureKey(force = false) {
+            if (this.azureSpeech === null || force) {
+                console.log(config.db)
+                const docRef = doc(config.db, "basic", 'azure-speech');
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    this.azureSpeech = {
+                        key: docSnap.data().key,
+                        region: docSnap.data().region,
+                        url: docSnap.data().url,
+                    }
+                } else {
+                    this.azureKey = null;
+                }
+            }
         }
     }
 })

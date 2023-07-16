@@ -21,13 +21,13 @@ async function ttsBtnTap() {
     return;
   }
   isLoading.value = true;
-  if (config.azureSpeech === null) {
+  if (ttsStore.azureSpeech === null) {
     await azureKeySet();
   }
 
   const headers = {
     'Content-Type': 'application/ssml+xml',
-    'Ocp-Apim-Subscription-Key': config.azureSpeech.key,
+    'Ocp-Apim-Subscription-Key': ttsStore.azureSpeech.key,
     'X-Microsoft-OutputFormat': 'audio-16khz-128kbitrate-mono-mp3',
   };
 
@@ -36,7 +36,7 @@ async function ttsBtnTap() {
   let content = "<voice xml:lang='zh-CN' xml:gender='"  + voice.gender + "' name='zh-HK-" + voice.name +"Neural' style='SeniorMale'>" + _inputStr + "</voice>"
   let requestStr = "<speak version='1.0' xml:lang='zh-HK'>" + content + " </speak>"
 
-  axios.post(config.azureSpeech.url, requestStr, {
+  axios.post(ttsStore.azureSpeech.url, requestStr, {
     responseType: 'arraybuffer',
     headers: headers
   })
@@ -106,6 +106,16 @@ function onPlayTimeChange() {
   lastTime.value = (minutes > 9 ? minutes.toString() : "0" + minutes.toString()) + ":" + (seconds > 9 ? seconds.toString() : "0" + seconds.toString());
 }
 
+watch(isPlaying, (newValue, oldValue) => {
+  if (!newValue) {
+    audioStopBtnTap();
+
+    nextTick(() => {
+      onPlayTimeChange();
+    })
+  }
+})
+
 onMounted(() => {
   config.tag = 'tts';
 
@@ -125,7 +135,7 @@ watch(() => config.elecoxyKey, async (newValue, oldValue) => {
 
 async function azureKeySet(force = false) {
   isLoading.value = true;
-  await config.setAzureKey(force);
+  await ttsStore.setTTSAzureKey();
   isLoading.value = false;
 }
 
@@ -137,20 +147,13 @@ async function azureKeySet(force = false) {
     <div class="container px-3 pb-5">
       <div class="columns is-mobile is-multiline">
         <div class="column is-full">
-          <div class="columns is-multiline is-mobile mt-3 mx-0 mb-2">
-            <h1 class="column is-full p-0 mb-2" style="font-weight: bold">Elecoxy Key</h1>
-            <input class="column systemMessage" :value="config.elecoxyKey" placeholder="Please input the elecoxy key"
-                   type="password" @change="config.elecoxyKey = $event.target.value">
-          </div>
-        </div>
-        <div class="column is-full pt-1">
-          <div class="columns is-multiline is-mobile">
+          <div class="columns is-multiline is-mobile m-0">
             <div class="column is-full m-0 p-0">
-              <audio ref="player" :src="audioSource" @playing="isPlaying = true" @pause="isPlaying = false" @timeupdate="onPlayTimeChange" @loadeddata="onPlayTimeChange"/>
+              <audio ref="player" :src="audioSource" @playing="isPlaying = true" @pause="isPlaying = false;" @timeupdate="onPlayTimeChange" @loadeddata="onPlayTimeChange"/>
             </div>
             <div class="column is-full py-0">
-              <div style="background-color: black; border-radius: 5px; height: 300px">
-                <canvas ref="canvas" style="margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, calc(-50% - 100px));" v-if="isPlaying"/>
+              <div style="background-color: black; border-radius: 5px; height: 300px; position: relative">
+                <canvas class="audioVisualCanvas" ref="canvas" v-if="isPlaying"/>
               </div>
             </div>
             <div v-if="player" class="column is-full is-align-items-center is-flex">
@@ -218,6 +221,14 @@ textarea {
   min-height: 100px;
   font-size: 1.3rem;
   line-height: 1.8rem;
+}
+
+.audioVisualCanvas {
+  margin: 0;
+  position: absolute;
+  left: 50%;
+  top: calc(150px - 30px);
+  transform: translateX(-50%);
 }
 
 </style>
