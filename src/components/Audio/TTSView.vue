@@ -145,8 +145,8 @@ async function azureKeySet(force = false) {
 <div class="hero">
   <div class="hero-body p-0">
     <div class="container px-3 pb-5">
-      <div class="columns is-mobile is-multiline">
-        <div class="column is-full">
+      <div class="columns is-mobile is-multiline m-0 mt-5">
+        <div class="column is-full p-0">
           <div class="columns is-multiline is-mobile m-0">
             <div class="column is-full m-0 p-0">
               <audio ref="player" :src="audioSource" @playing="isPlaying = true" @pause="isPlaying = false;" @timeupdate="onPlayTimeChange" @loadeddata="onPlayTimeChange"/>
