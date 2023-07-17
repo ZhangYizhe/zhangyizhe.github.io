@@ -210,6 +210,9 @@ async function azureKeySet(force = false) {
             <button :class="['button is-danger', isLoading ? 'is-loading' : '']" @click="cleanContentBtnTap" :disabled="isLoading">
               Clear
             </button>
+            <a :href="audioSource" :download="Date.now().toString() + '.mp3'" :class="['button is-info', isLoading ? 'is-loading' : '']">
+              Download
+            </a>
             <button :class="['button is-warning', isLoading ? 'is-loading' : '']" @click="ttsBtnTap" :disabled="isLoading">
               Generation
             </button>
