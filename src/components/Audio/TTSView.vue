@@ -33,7 +33,8 @@ async function ttsBtnTap() {
 
   const voice = ttsStore.voiceList[ttsStore.currentVoice]
 
-  let content = "<voice xml:lang='zh-CN' xml:gender='"  + voice.gender + "' name='zh-HK-" + voice.name +"Neural' style='SeniorMale'>" + _inputStr + "</voice>"
+  let prosody = '<prosody pitch="' + ttsStore.azurePitch +'" rate="' + ttsStore.azureSpeed + '">' + _inputStr + "</prosody>"
+  let content = "<voice xml:lang='zh-CN' xml:gender='"  + voice.gender + "' name='zh-HK-" + voice.name +"Neural' style='SeniorMale'>" + prosody + "</voice>"
   let requestStr = "<speak version='1.0' xml:lang='zh-HK'>" + content + " </speak>"
 
   axios.post(ttsStore.azureSpeech.url, requestStr, {
@@ -157,43 +158,62 @@ async function azureKeySet(force = false) {
               </div>
             </div>
             <div v-if="player" class="column is-full is-align-items-center is-flex">
-              <span class="mr-3 button is-warning" style="min-width: 100px">
-                {{lastTime}}
-              </span>
-              <button :class="['button', isLoading ? 'is-loading' : '']" @click="audioPlayBtnTap" :disabled="isLoading">
-                <template v-if="!isPlaying">
-                  Play
-                </template>
-                <template v-else>
-                  Stop
-                </template>
-              </button>
+              <div class="buttons has-addons">
+                <button class="button is-warning" style="min-width: 100px" disabled>
+                  {{lastTime}}
+                </button>
+                <button :class="['button', isLoading ? 'is-loading' : '']" @click="audioPlayBtnTap" :disabled="isLoading">
+                  <template v-if="!isPlaying">
+                    Play
+                  </template>
+                  <template v-else>
+                    Stop
+                  </template>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="column is-full">
+          <div class="buttons has-addons">
+            <button class="button" disabled>Pitch</button>
+            <div :class="['button', pitch === ttsStore.azurePitch ? 'is-warning' : '']"  @click="ttsStore.azurePitch = pitch" v-for="pitch in ttsStore.pitchList">
+              {{ pitch }}
+            </div>
+          </div>
+        </div>
+        <div class="column is-full">
+          <div class="buttons has-addons">
+            <button class="button" disabled>Speed</button>
+            <div :class="['button', speed === ttsStore.azureSpeed ? 'is-warning' : '']"  @click="ttsStore.azureSpeed = speed" v-for="speed in ttsStore.speedList">
+              {{ speed }}
             </div>
           </div>
         </div>
         <div class="column">
           <div class="buttons has-addons">
+            <button class="button" disabled>Voice</button>
             <div :class="['button', voice.id === ttsStore.currentVoice ? 'is-warning' : '']"  @click="ttsStore.currentVoice = voice.id" v-for="voice in ttsStore.voiceList">
               {{ voice.displayName }} : {{ voice.gender }}
             </div>
           </div>
         </div>
         <div class="column is-full">
-          <div class="columns is-vcentered">
-            <div class="column">
+          <div class="columns is-multiline is-mobile is-vcentered">
+            <div class="column is-full">
               <textarea ref="ttsInputRef" placeholder="Type something here" v-model="ttsStore.lastVoiceStr"></textarea>
-            </div>
-            <div class="column is-narrow">
-              <button :class="['button is-warning', isLoading ? 'is-loading' : '']" @click="ttsBtnTap" :disabled="isLoading">
-                Generation
-              </button>
             </div>
           </div>
         </div>
         <div class="column is-full pt-0">
-          <button :class="['button is-danger', isLoading ? 'is-loading' : '']" @click="cleanContentBtnTap" :disabled="isLoading">
-            Clear
-          </button>
+          <div class="buttons">
+            <button :class="['button is-danger', isLoading ? 'is-loading' : '']" @click="cleanContentBtnTap" :disabled="isLoading">
+              Clear
+            </button>
+            <button :class="['button is-warning', isLoading ? 'is-loading' : '']" @click="ttsBtnTap" :disabled="isLoading">
+              Generation
+            </button>
+          </div>
         </div>
       </div>
     </div>
