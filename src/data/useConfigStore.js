@@ -22,6 +22,7 @@ export const useConfigStore= defineStore('config',{
             return {
                 grammar: '1.7.0',
                 translate: '1.2.0',
+                c2m: '1.0.0',
             }
         },
         db: () => firebaseDB,

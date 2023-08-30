@@ -15,7 +15,7 @@ const rightInputRef = ref(null);
 
 const isLoading = ref(false);
 const copyBtnStr = ref("Copy");
-const isGrammar = ref(true);
+const functionType = ref("grammar");
 
 const prompts = ref({
   translation: "I want you to act as an English translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in English. I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, upper level English words and sentences. Keep the meaning same, but make them more literary. I want you to only reply the correction, the improvements and nothing else, do not write explanations.\n",
@@ -28,15 +28,19 @@ const prompts = ref({
       "\n" +
       "After reply the result, check the content by the below steps:\n" +
       "Step-1: Don't use triple backticks around the text.\n" +
-      "Step-2: Don't use conversation tune to response.\n"
+      "Step-2: Don't use conversation tune to response.\n",
+
+  c2m: "我希望你是一個廣東話口語轉書面語的翻譯、糾正員和改進員。我會用廣東話和你交流，你會轉譯內容為中文書面語，你只需要轉譯內容，保持含義相同，但使它們更具文學性。我希望你只回復更正、改進，不要寫任何其他內容，不要寫解釋。"
 })
 
 const prompt = computed(() => {
   let prompt = ""
-  if (isGrammar.value) {
+  if (functionType.value === "grammar") {
     prompt = prompts.value.grammar
-  } else {
+  } else if (functionType.value === "translate") {
     prompt = prompts.value.translation
+  } else {
+    prompt = prompts.value.c2m
   }
 
   return prompt + "\n" +
@@ -167,15 +171,20 @@ onMounted(() => {
   <div style="background-color: #fafafa; padding-bottom: 35px">
     <div class="container py-3 px-3">
       <div class="buttons">
-        <button :class="['button', isGrammar ? 'is-link' : '']" style="font-size: 0.8rem; font-weight: bold"
-                @click="isGrammar = true"><i class="bi bi-spellcheck"
+        <button :class="['button', functionType === 'grammar' ? 'is-link' : '']" style="font-size: 0.8rem; font-weight: bold"
+                @click="functionType = 'grammar'"><i class="bi bi-spellcheck"
                                              style="margin-right: 5px; font-size: 1rem"></i>Grammar
           ( {{ config.languageVersion.grammar }} )
         </button>
-        <button :class="['button', isGrammar ? '' : 'is-link']" style="font-size: 0.8rem; font-weight: bold"
-                @click="isGrammar = false"><i class="bi bi-spellcheck"
+        <button :class="['button', functionType === 'translate' ? 'is-link' : '']" style="font-size: 0.8rem; font-weight: bold"
+                @click="functionType = 'translate'"><i class="bi bi-spellcheck"
                                               style="margin-right: 5px; font-size: 1rem"></i>Translate
           ( {{ config.languageVersion.translate }} )
+        </button>
+        <button :class="['button', functionType === 'c2m' ? 'is-link' : '']" style="font-size: 0.8rem; font-weight: bold"
+                @click="functionType = 'c2m'"><i class="bi bi-spellcheck"
+                                                       style="margin-right: 5px; font-size: 1rem"></i>粵轉書面
+          ( {{ config.languageVersion.c2m }} )
         </button>
       </div>
       <div class="columns is-multiline is-mobile mt-3 mx-0 mb-2">
@@ -219,7 +228,15 @@ onMounted(() => {
                   <div class="loader is-loading"></div>
                 </div>
               </template>
-              {{ isGrammar ? 'Grammar' : 'Translate' }}
+              <template v-if="functionType === 'grammar'">
+                Grammar
+              </template>
+              <template v-else-if="functionType === 'translate'">
+                Translate
+              </template>
+              <template v-else>
+                粵轉書面
+              </template>
             </button>
           </div>
         </div>
