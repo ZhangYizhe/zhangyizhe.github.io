@@ -16,7 +16,7 @@ export const useConfigStore= defineStore('config',{
     },
 
     getters: {
-        modelVersion: () => 'gpt-35-turbo',
+        modelVersion: () => 'gpt-4',
         apiVersion: () => '2023-05-15',
         languageVersion: () => {
             return {
