@@ -42,6 +42,22 @@ onMounted(() => {
           <div class="column is-full" style="margin: 5px 0 5px 0">
             <p style="color: #4a4a4a"><i class="bi bi-geo-alt-fill"></i> {{ user.location }}</p>
           </div>
+
+          <div class="column is-full" style="margin: 5px 0 5px 0">
+            <a
+                id="cy-effective-orcid-url"
+                class="underline"
+                href="https://orcid.org/0009-0004-0224-345X"
+                target="orcid.widget"
+                rel="me noopener noreferrer"
+                style="display: flex; align-items:center;">
+              <img
+                  src="https://orcid.org/sites/default/files/images/orcid_16x16.png"
+                  style="width: 1em; margin-right: 4px"
+                  alt="ORCID iD icon"/>
+              <span>0009-0004-0224-345X</span>
+            </a>
+          </div>
         </div>
       </div>
       <div class="column is-8">
