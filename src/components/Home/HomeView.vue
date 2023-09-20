@@ -89,6 +89,10 @@ onMounted(() => {
               </template>
             </div>
           </div>
+
+          <div class="column is-full" style="padding-bottom: 30px">
+            <a href="https://clustrmaps.com/site/1bwm9"  title="Visit tracker"><img src="//www.clustrmaps.com/map_v2.png?d=TgcBQmn0jNy8uFJHMz22_Op-Zj_XqMCJnG1kjJ1zhxE&cl=ffffff" /></a>
+          </div>
         </div>
       </div>
     </div>
