@@ -5,6 +5,8 @@ import {nextTick, onMounted, ref, watch} from "vue";
 
 const config = useConfigStore();
 
+const isErrorKey = ref(false);
+
 const systemMessages = ref({
   role: "system",
   content: "",
@@ -25,7 +27,7 @@ function sendBtnTap(e) {
 
   const textTrim = inputText.value.trim();
 
-  if (textTrim === '') {
+  if (textTrim === '' || config.azureKey === '') {
     return;
   }
 
@@ -179,6 +181,8 @@ async function azureKeySet(force = false) {
   isLoading.value = true;
   await config.setAzureKey(force);
   isLoading.value = false;
+
+  isErrorKey.value = config.elecoxyKey !== '' && config.azureKey === '';
 }
 
 // Lifecycle
@@ -229,7 +233,9 @@ onMounted(() => {
                   </div>
                   <div class="columns is-multiline is-mobile">
                     <h1 class="column is-full" style="padding-left: 0; font-weight: bold">Elecoxy Key</h1>
-                    <input class="column systemMessage" :value="config.elecoxyKey" placeholder="Please input the elecoxy key" type="password" @change="config.elecoxyKey = $event.target.value">
+                    <input class="column systemMessage" :value="config.elecoxyKey" placeholder="Please input the elecoxy key" type="password" @change="config.elecoxyKey = $event.target.value;">
+
+                    <small class="column is-full px-0" style="color: red" v-if="isErrorKey">Please input the correct key!</small>
                   </div>
                 </div>
               </div>
@@ -296,23 +302,25 @@ onMounted(() => {
     </div>
   </div>
 
-  <div :class="['inputView', isLoading ? 'inputView-disabled' : '']">
-    <div class="columns is-gapless is-mobile">
-      <div class="column">
+<!--  <template v-if="config.azureKey !== ''">-->
+    <div :class="['inputView', (isLoading || config.azureKey === '') ? 'inputView-disabled' : '']">
+      <div class="columns is-gapless is-mobile">
+        <div class="column">
         <textarea v-model="inputText" placeholder="說點什麼吧" ref="inputTextareaRef"
-                  :disabled="isLoading"></textarea>
+                  :disabled="isLoading || config.azureKey === ''"></textarea>
 
           <!--  @keyup.enter.exact="sendBtnTap"-->
-      </div>
-      <div class="column is-narrow" style="margin: 0 0 0 5px">
-        <button type="button" class="button" @click="sendBtnTap" :disabled="isLoading"><i class="bi bi-send"></i>
-        </button>
-        <button type="button" class="button" @click="resetConversation" :disabled="isLoading"><i
-            class="bi bi-arrow-clockwise"></i>
-        </button>
+        </div>
+        <div class="column is-narrow" style="margin: 0 0 0 5px">
+          <button type="button" class="button" @click="sendBtnTap" :disabled="isLoading || config.azureKey === ''"><i class="bi bi-send"></i>
+          </button>
+          <button type="button" class="button" @click="resetConversation" :disabled="isLoading || config.azureKey === ''"><i
+              class="bi bi-arrow-clockwise"></i>
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+<!--  </template>-->
 
 </template>
 

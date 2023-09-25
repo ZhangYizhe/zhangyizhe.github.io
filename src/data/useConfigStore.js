@@ -8,10 +8,10 @@ export const useConfigStore= defineStore('config',{
             return {
                 tag: 'home',
                 isExpended: false,
-                azureKey: null,
-                azureUrl: null,
-                elecoxyKey: null,
-                azureSpeech: null,
+                azureKey: "",
+                azureUrl: "",
+                elecoxyKey: "",
+                azureSpeech: "",
             }
     },
 
@@ -30,17 +30,27 @@ export const useConfigStore= defineStore('config',{
 
     actions: {
         async setAzureKey(force = false) {
-            if ((this.elecoxyKey !== '' && this.azureKey === null) || force) {
+            if (this.elecoxyKey === '' || force) {
                 // getOrder
-                const docRef = doc(this.db, "basic", this.elecoxyKey);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    this.azureKey = docSnap.data().azureKey;
-                    this.azureUrl = docSnap.data().azureUrl;
-                    this.azureSpeech = docSnap.data().azureSpeech;
-                } else {
-                    this.azureKey = null;
+                try {
+                    const docRef = doc(this.db, "basic", this.elecoxyKey);
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists()) {
+                        this.azureKey = docSnap.data().azureKey;
+                        this.azureUrl = docSnap.data().azureUrl;
+                        this.azureSpeech = docSnap.data().azureSpeech;
+                    } else {
+                        this.azureKey = "";
+                        this.azureUrl = "";
+                        this.azureSpeech = "";
+                    }
+                } catch (e) {
+                    this.azureKey = "";
+                    this.azureUrl = "";
+                    this.azureSpeech = "";
                 }
+
             }
         }
     }
