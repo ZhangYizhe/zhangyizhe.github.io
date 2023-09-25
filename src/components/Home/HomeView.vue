@@ -91,7 +91,7 @@ onMounted(() => {
           </div>
 
           <div class="column is-full" style="padding-bottom: 30px">
-            <a href="https://clustrmaps.com/site/1bwm9"  title="Visit tracker"><img src="//www.clustrmaps.com/map_v2.png?d=TgcBQmn0jNy8uFJHMz22_Op-Zj_XqMCJnG1kjJ1zhxE&cl=ffffff" /></a>
+            <component is="script" type="text/javascript" id="clustrmaps" src="//cdn.clustrmaps.com/map_v2.js?cl=ffffff&w=300&t=tt&d=TgcBQmn0jNy8uFJHMz22_Op-Zj_XqMCJnG1kjJ1zhxE&co=000000" async></component>
           </div>
         </div>
       </div>

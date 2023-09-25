@@ -20,11 +20,11 @@ const routes = [
         component: () => import('@/components/Language/LanguageView.vue'),
     },
 
-    {
-        path: '/tts',
-        name: 'tts',
-        component: () => import('@/components/Audio/TTSView.vue'),
-    },
+    // {
+    //     path: '/tts',
+    //     name: 'tts',
+    //     component: () => import('@/components/Audio/TTSView.vue'),
+    // },
     //
     // {
     //     path: '/imageai',

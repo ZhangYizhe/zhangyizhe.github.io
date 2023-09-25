@@ -40,9 +40,9 @@ const isExpended = computed(() => config.isExpended)
                         <router-link to="/chat" :class="['navbar-item', tag === 'chat' ? 'is-active' : '']">
                             Chat
                         </router-link>
-                        <router-link to="/tts" :class="['navbar-item', tag === 'tts' ? 'is-active' : '']">
-                          TTS<span style="font-size: 10px; margin-left: 5px; padding: 2px 5px; background-color: green; color: white; border-radius: 5px">Beta</span>
-                        </router-link>
+<!--                        <router-link to="/tts" :class="['navbar-item', tag === 'tts' ? 'is-active' : '']">-->
+<!--                          TTS<span style="font-size: 10px; margin-left: 5px; padding: 2px 5px; background-color: green; color: white; border-radius: 5px">Beta</span>-->
+<!--                        </router-link>-->
 <!--                        <router-link to="/audio" :class="['navbar-item', tag === 'audio' ? 'is-active' : '']">-->
 <!--                          Speech To Text-->
 <!--                        </router-link>-->
