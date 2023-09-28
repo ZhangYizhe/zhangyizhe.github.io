@@ -39,8 +39,8 @@ export const useConfigStore= defineStore('config',{
                     const docSnap = await getDoc(docRef);
 
                     if (docSnap.exists()) {
-                        this.gptKey = docSnap.data().hkbu.gptKey;
-                        this.gptURL = docSnap.data().hkbu.gptURL;
+                        this.gptKey = docSnap.data().azureKey;
+                        this.gptURL = docSnap.data().azureUrl;
                         this.azureSpeech = docSnap.data().azureSpeech;
                     } else {
                         this.gptKey = "";
