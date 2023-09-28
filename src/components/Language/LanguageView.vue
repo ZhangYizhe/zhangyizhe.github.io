@@ -75,10 +75,10 @@ function request() {
 
   const headers = {
     'Content-Type': 'application/json',
-    'api-key': config.azureKey,
+    'api-key': config.gptKey,
   };
 
-  axios.post(config.azureUrl + `/openai/deployments/${config.modelVersion}/chat/completions?api-version=${config.apiVersion}`, {
+  axios.post(config.gptURL + `/openai/deployments/${config.modelVersion}/chat/completions?api-version=${config.apiVersion}`, {
     temperature: 0,
     messages: [
       {
@@ -142,16 +142,16 @@ function translateBtnTap() {
   window.open("https://translate.google.com.hk/?sl=auto&tl=zh-TW&text=" + inputs.right + "&op=translate", "_blank")
 }
 
-async function azureKeySet(force = false) {
+async function gptKeySet(force = false) {
   isLoading.value = true;
-  await config.setAzureKey(force);
+  await config.setGptKey(force);
   isLoading.value = false;
 }
 
 // Lifecycle
 watch(() => config.elecoxyKey, async (newValue, oldValue) => {
   await nextTick(() => {
-    azureKeySet(true);
+    gptKeySet(true);
   })
 })
 
@@ -162,7 +162,7 @@ watch(inputs,(newValue, oldValue) => {
 onMounted(() => {
   config.tag = 'language';
 
-  azureKeySet();
+  gptKeySet();
 })
 
 </script>

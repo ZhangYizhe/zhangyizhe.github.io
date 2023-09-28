@@ -22,7 +22,7 @@ async function ttsBtnTap() {
   }
   isLoading.value = true;
   if (ttsStore.azureSpeech === null) {
-    await azureKeySet();
+    await gptKeySet();
   }
 
   const headers = {
@@ -121,7 +121,7 @@ onMounted(() => {
   config.tag = 'tts';
 
   resizeTextarea();
-  azureKeySet();
+  gptKeySet();
 })
 
 watch(() => ttsStore.lastVoiceStr, () => {
@@ -130,13 +130,13 @@ watch(() => ttsStore.lastVoiceStr, () => {
 
 watch(() => config.elecoxyKey, async (newValue, oldValue) => {
   await nextTick(() => {
-    azureKeySet(true);
+    gptKeySet(true);
   })
 })
 
-async function azureKeySet(force = false) {
+async function gptKeySet(force = false) {
   isLoading.value = true;
-  await ttsStore.setTTSAzureKey();
+  await ttsStore.setTTSGptKey();
   isLoading.value = false;
 }
 

@@ -2,7 +2,6 @@
 import { useConfigStore } from "@/data/useConfigStore";
 import { fetchEventSource } from "@microsoft/fetch-event-source"
 import {nextTick, onMounted, ref, watch} from "vue";
-import axios from "axios";
 
 const config = useConfigStore();
 
@@ -56,115 +55,89 @@ async function request() {
 
   isLoading.value = true;
 
-  axios.post(
-      config.gptURL + `/deployments/${config.modelVersion}/chat/completions?api-version=${config.apiVersion}`,
-      {
-        messages: [systemMessages.value, ...messages.value],
-        temperature: 0
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'api-key': config.gptKey,
-        }
+  await fetchEventSource(config.gptURL + `/openai/deployments/${config.modelVersion}/chat/completions?api-version=${config.apiVersion}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'api-key': config.gptKey,
+    },
+    body: JSON.stringify({
+      messages: [systemMessages.value, ...messages.value],
+      stream: true,
+    }),
+    async onopen(response) {
+      if (response.status === 200) {
+        tempMessage.value = "";
+        return;
       }
-      )
-      .then(function (response) {
-        try {
+
+      switch (response.status) {
+        case 201 :
+          alert(`Error Code: ${response.status}, invalid Elecoxy key.`);
+          break;
+        case 401 :
+          alert(`Error Code: ${response.status}, invalid Authentication.`);
+          break;
+        case 403 :
+          alert(`Error Code: ${response.status}, invalid Elecoxy Authentication, please try again later.`);
+          break;
+        case 429 :
+          alert(`Error Code: ${response.status}, rate limit reached for requests, please try again later.`);
+          break;
+        case 500 :
+          alert(`Error Code: ${response.status}, the server had an error while processing your request, please try again later.`);
+          break;
+        default:
+          alert(`Error Code: ${response.status}, please try again later.`);
+          break;
+      }
+    },
+    onmessage(msg) {
+
+      if (msg.data === "[DONE]") {
+        return
+      }
+
+      const data = JSON.parse(msg.data);
+      if (data.object === "") {
+        return;
+      }
+
+      try {
+        const delta = data.choices[0].delta;
+        const finish_reason = data.choices[0].finish_reason;
+
+        if (finish_reason !== null) {
+          const stopMessage = {
+            "role": "assistant",
+            "content": tempMessage.value.replaceAll("\n", "<br />")
+          }
+
           isLoading.value = false;
+          tempMessage.value = "";
 
-          const data = response.data;
-          const message = data.choices[0].message;
-
-          messages.value.push(message);
-        } catch (e) {
-          alert(e)
+          messages.value.push(stopMessage);
+          return;
         }
-      })
-      .catch(function (error) {
-        isLoading.value = false;
-        alert(error);
-      })
 
-  // await fetchEventSource(config.gptUrl + `/openai/deployments/${config.modelVersion}/chat/completions?api-version=${config.apiVersion}`, {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //     'api-key': config.gptKey,
-  //   },
-  //   body: JSON.stringify(),
-  //   async onopen(response) {
-  //     if (response.status === 200) {
-  //       tempMessage.value = "";
-  //       return;
-  //     }
-  //
-  //     switch (response.status) {
-  //       case 201 :
-  //         alert(`Error Code: ${response.status}, invalid Elecoxy key.`);
-  //         break;
-  //       case 401 :
-  //         alert(`Error Code: ${response.status}, invalid Authentication.`);
-  //         break;
-  //       case 403 :
-  //         alert(`Error Code: ${response.status}, invalid Elecoxy Authentication, please try again later.`);
-  //         break;
-  //       case 429 :
-  //         alert(`Error Code: ${response.status}, rate limit reached for requests, please try again later.`);
-  //         break;
-  //       case 500 :
-  //         alert(`Error Code: ${response.status}, the server had an error while processing your request, please try again later.`);
-  //         break;
-  //       default:
-  //         alert(`Error Code: ${response.status}, please try again later.`);
-  //         break;
-  //     }
-  //   },
-  //   onmessage(msg) {
-  //
-  //     if (msg.data === "[DONE]") {
-  //       return
-  //     }
-  //
-  //     const data = JSON.parse(msg.data);
-  //     if (data.object === "") {
-  //       return;
-  //     }
-  //
-  //     try {
-  //       const delta = data.choices[0].delta;
-  //       const finish_reason = data.choices[0].finish_reason;
-  //
-  //       if (finish_reason !== null) {
-  //         const stopMessage = {
-  //           "role": "assistant",
-  //           "content": tempMessage.value.replaceAll("\n", "<br />")
-  //         }
-  //
-  //         isLoading.value = false;
-  //         tempMessage.value = "";
-  //
-  //         messages.value.push(stopMessage);
-  //         return;
-  //       }
-  //
-  //       if (delta['content'] !== undefined) {
-  //         tempMessage.value += delta["content"];
-  //         scrollToBottomWithoutTimer();
-  //       }
-  //     } catch (e) {
-  //       alert(e)
-  //     }
-  //   },
-  //   onclose() {
-  //
-  //   },
-  //   onerror(err) {
-  //     isLoading.value = false;
-  //     tempMessage.value = "";
-  //     throw err;
-  //   }
-  // })
+        if (delta['content'] !== undefined) {
+          tempMessage.value += delta["content"];
+          scrollToBottomWithoutTimer();
+        }
+      } catch (e) {
+        alert(e)
+      }
+    },
+    onclose() {
+
+    },
+    onerror(err) {
+      isLoading.value = false;
+      tempMessage.value = "";
+      throw err;
+    }
+  })
+  isLoading.value = false;
 }
 
 function addNewMessage(content) {
@@ -342,25 +315,25 @@ onMounted(() => {
     </div>
   </div>
 
-<!--  <template v-if="config.gptKey !== ''">-->
-    <div :class="['inputView', (isLoading || config.gptKey === '') ? 'inputView-disabled' : '']">
-      <div class="columns is-gapless is-mobile">
-        <div class="column">
+  <!--  <template v-if="config.gptKey !== ''">-->
+  <div :class="['inputView', (isLoading || config.gptKey === '') ? 'inputView-disabled' : '']">
+    <div class="columns is-gapless is-mobile">
+      <div class="column">
         <textarea v-model="inputText" placeholder="說點什麼吧" ref="inputTextareaRef"
                   :disabled="isLoading || config.gptKey === ''"></textarea>
 
-          <!--  @keyup.enter.exact="sendBtnTap"-->
-        </div>
-        <div class="column is-narrow" style="margin: 0 0 0 5px">
-          <button type="button" class="button" @click="sendBtnTap" :disabled="isLoading || config.gptKey === ''"><i class="bi bi-send"></i>
-          </button>
-          <button type="button" class="button" @click="resetConversation" :disabled="isLoading || config.gptKey === ''"><i
-              class="bi bi-arrow-clockwise"></i>
-          </button>
-        </div>
+        <!--  @keyup.enter.exact="sendBtnTap"-->
+      </div>
+      <div class="column is-narrow" style="margin: 0 0 0 5px">
+        <button type="button" class="button" @click="sendBtnTap" :disabled="isLoading || config.gptKey === ''"><i class="bi bi-send"></i>
+        </button>
+        <button type="button" class="button" @click="resetConversation" :disabled="isLoading || config.gptKey === ''"><i
+            class="bi bi-arrow-clockwise"></i>
+        </button>
       </div>
     </div>
-<!--  </template>-->
+  </div>
+  <!--  </template>-->
 
 </template>
 

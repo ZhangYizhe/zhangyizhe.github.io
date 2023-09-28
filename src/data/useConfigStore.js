@@ -8,8 +8,10 @@ export const useConfigStore= defineStore('config',{
             return {
                 tag: 'home',
                 isExpended: false,
-                azureKey: "",
-                azureUrl: "",
+
+                gptKey: "",
+                gptURL: "",
+
                 elecoxyKey: "",
                 azureSpeech: "",
             }
@@ -29,7 +31,7 @@ export const useConfigStore= defineStore('config',{
     },
 
     actions: {
-        async setAzureKey(force = false) {
+        async setGptKey(force = false) {
             if (this.elecoxyKey === '' || force) {
                 // getOrder
                 try {
@@ -37,17 +39,17 @@ export const useConfigStore= defineStore('config',{
                     const docSnap = await getDoc(docRef);
 
                     if (docSnap.exists()) {
-                        this.azureKey = docSnap.data().azureKey;
-                        this.azureUrl = docSnap.data().azureUrl;
+                        this.gptKey = docSnap.data().hkbu.gptKey;
+                        this.gptURL = docSnap.data().hkbu.gptURL;
                         this.azureSpeech = docSnap.data().azureSpeech;
                     } else {
-                        this.azureKey = "";
-                        this.azureUrl = "";
+                        this.gptKey = "";
+                        this.gptURL = "";
                         this.azureSpeech = "";
                     }
                 } catch (e) {
-                    this.azureKey = "";
-                    this.azureUrl = "";
+                    this.gptKey = "";
+                    this.gptURL = "";
                     this.azureSpeech = "";
                 }
 

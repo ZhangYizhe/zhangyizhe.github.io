@@ -57,7 +57,7 @@ export const useTTSStore= defineStore('tts',{
     },
 
     actions: {
-        async setTTSAzureKey(force = false) {
+        async setTTSGptKey(force = false) {
             if (this.azureSpeech === null || force) {
                 console.log(config.db)
                 const docRef = doc(config.db, "basic", 'azure-speech');
@@ -69,7 +69,7 @@ export const useTTSStore= defineStore('tts',{
                         url: docSnap.data().url,
                     }
                 } else {
-                    this.azureKey = null;
+                    this.gptKey = "";
                 }
             }
         }
