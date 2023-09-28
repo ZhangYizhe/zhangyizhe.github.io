@@ -93,26 +93,39 @@ async function request() {
       }
     },
     onmessage(msg) {
+
+      if (msg.data === "[DONE]") {
+        return
+      }
+
       const data = JSON.parse(msg.data);
-      const delta = data.choices[0].delta;
-      const finish_reason = data.choices[0].finish_reason;
-
-      if (finish_reason !== null) {
-        const stopMessage = {
-          "role": "assistant",
-          "content": tempMessage.value.replaceAll("\n", "<br />")
-        }
-
-        isLoading.value = false;
-        tempMessage.value = "";
-
-        messages.value.push(stopMessage);
+      if (data.object === "") {
         return;
       }
 
-      if (delta['content'] !== undefined) {
-        tempMessage.value += delta["content"];
-        scrollToBottomWithoutTimer();
+      try {
+        const delta = data.choices[0].delta;
+        const finish_reason = data.choices[0].finish_reason;
+
+        if (finish_reason !== null) {
+          const stopMessage = {
+            "role": "assistant",
+            "content": tempMessage.value.replaceAll("\n", "<br />")
+          }
+
+          isLoading.value = false;
+          tempMessage.value = "";
+
+          messages.value.push(stopMessage);
+          return;
+        }
+
+        if (delta['content'] !== undefined) {
+          tempMessage.value += delta["content"];
+          scrollToBottomWithoutTimer();
+        }
+      } catch (e) {
+        alert(e)
       }
     },
     onclose() {
