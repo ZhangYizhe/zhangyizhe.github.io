@@ -76,6 +76,8 @@ async function request() {
           }
           const message = data.choices[0].message;
           messages.value.push(message);
+
+          scrollToBottom();
         } catch (e) {
           alert(e)
         }
