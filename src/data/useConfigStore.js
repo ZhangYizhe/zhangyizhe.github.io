@@ -9,7 +9,7 @@ export const useConfigStore= defineStore('config',{
                 tag: 'home',
                 isExpended: false,
 
-                gptURL: "https://ai.yizheyun.cn",
+                bugptURL: "https://ai.yizheyun.cn",
 
                 azureSpeech: "",
             }

@@ -77,7 +77,7 @@ function request() {
     'Content-Type': 'application/json',
   };
 
-  axios.post(config.gptURL, {
+  axios.post(config.bugptURL, {
     temperature: 0,
     messages: [
       {

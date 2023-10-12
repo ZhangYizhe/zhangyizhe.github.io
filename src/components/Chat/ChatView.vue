@@ -54,7 +54,7 @@ async function request() {
   isLoading.value = true;
 
   axios.post(
-      config.gptURL,
+      config.bugptURL,
       {
         messages: systemMessages.value.content === '' ? messages.value : [systemMessages.value, ...messages.value],
         temperature: 0
