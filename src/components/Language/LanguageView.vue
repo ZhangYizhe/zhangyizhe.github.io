@@ -75,10 +75,9 @@ function request() {
 
   const headers = {
     'Content-Type': 'application/json',
-    'api-key': config.gptKey,
   };
 
-  axios.post(config.gptURL + `/openai/deployments/${config.modelVersion}/chat/completions?api-version=${config.apiVersion}`, {
+  axios.post(config.gptURL, {
     temperature: 0,
     messages: [
       {
@@ -142,27 +141,12 @@ function translateBtnTap() {
   window.open("https://translate.google.com.hk/?sl=auto&tl=zh-TW&text=" + inputs.right + "&op=translate", "_blank")
 }
 
-async function gptKeySet(force = false) {
-  isLoading.value = true;
-  await config.setGptKey(force);
-  isLoading.value = false;
-}
-
-// Lifecycle
-watch(() => config.elecoxyKey, async (newValue, oldValue) => {
-  await nextTick(() => {
-    gptKeySet(true);
-  })
-})
-
 watch(inputs,(newValue, oldValue) => {
       resizeTextarea()
 })
 
 onMounted(() => {
   config.tag = 'language';
-
-  gptKeySet();
 })
 
 </script>
@@ -186,11 +170,6 @@ onMounted(() => {
                                                        style="margin-right: 5px; font-size: 1rem"></i>粵轉書面
           ( {{ config.languageVersion.c2m }} )
         </button>
-      </div>
-      <div class="columns is-multiline is-mobile mt-3 mx-0 mb-2">
-        <h1 class="column is-full p-0 mb-2" style="font-weight: bold">Elecoxy Key</h1>
-        <input class="column is-6 systemMessage" :value="config.elecoxyKey" placeholder="Please input the elecoxy key"
-               type="password" @change="config.elecoxyKey = $event.target.value">
       </div>
     </div>
   </div>

@@ -5,8 +5,6 @@ import axios from "axios";
 
 const config = useConfigStore();
 
-const isErrorKey = ref(false);
-
 const systemMessages = ref({
   role: "system",
   content: "",
@@ -56,15 +54,14 @@ async function request() {
   isLoading.value = true;
 
   axios.post(
-      config.gptURL + `/openai/deployments/${config.modelVersion}/chat/completions?api-version=${config.apiVersion}`,
+      config.gptURL,
       {
-        messages: [systemMessages.value, ...messages.value],
+        messages: systemMessages.value.content === '' ? messages.value : [systemMessages.value, ...messages.value],
         temperature: 0
       },
       {
         headers: {
           'Content-Type': 'application/json',
-          'api-key': config.gptKey,
         }
       }
       )
@@ -73,8 +70,11 @@ async function request() {
           isLoading.value = false;
 
           const data = response.data;
+          if (data.error !== undefined) {
+            alert(data.error.message);
+            return;
+          }
           const message = data.choices[0].message;
-
           messages.value.push(message);
         } catch (e) {
           alert(e)
@@ -142,21 +142,6 @@ function scrollToBottomWithoutTimer() {
   })
 }
 
-async function gptKeySet(force = false) {
-  isLoading.value = true;
-  await config.setGptKey(force);
-  isLoading.value = false;
-
-  isErrorKey.value = config.elecoxyKey !== '' && config.gptKey === '';
-}
-
-// Lifecycle
-watch(() => config.elecoxyKey, async (newValue, oldValue) => {
-  await nextTick(() => {
-    gptKeySet(true);
-  })
-})
-
 watch(inputText, async (newValue, oldValue) => {
   await nextTick(() => {
     resizeTextarea()
@@ -167,8 +152,6 @@ onMounted(() => {
   config.tag = 'chat';
 
   resetConversation();
-
-  gptKeySet();
 })
 
 </script>
@@ -176,7 +159,6 @@ onMounted(() => {
 <template>
   <div class="canvas" ref="mainCanvasRef">
     <div class="columns is-multiline m-0">
-
       <div :class="['column is-full cal-basic', systemMessages.role === 'user' ? 'cal-user' : 'cal-assistant' ]">
         <div class="container is-max-desktop">
           <div class="columns is-multiline">
@@ -196,19 +178,12 @@ onMounted(() => {
                     <h1 class="column is-full" style="padding-left: 0; font-weight: bold">當前可記住對話輪次數（一次問答為一輪, 請不要超過50輪）</h1>
                     <input class="column systemMessage" v-model="recordsNum" placeholder="請輸入雙數。" type="number">
                   </div>
-                  <div class="columns is-multiline is-mobile">
-                    <h1 class="column is-full" style="padding-left: 0; font-weight: bold">Elecoxy Key</h1>
-                    <input class="column systemMessage" :value="config.elecoxyKey" placeholder="Please input the elecoxy key" type="password" @change="config.elecoxyKey = $event.target.value;">
-
-                    <small class="column is-full px-0" style="color: red" v-if="isErrorKey">Please input the correct key!</small>
-                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-
 
       <template v-for="(message, index) in messages">
         <div v-if="message.role !== 'system'"
