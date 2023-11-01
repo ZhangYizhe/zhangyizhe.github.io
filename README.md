@@ -1,29 +1,7 @@
-# zhangyizhe.github.io
+# 👋 Hello , Good Day !
 
-This template should help get you started developing with Vue 3 in Vite.
+> I am a Senior Research Assistant in the Department of Computer Science at Hong Kong Baptist University under the supervision of Prof. CHEN, Li. I received my M.Sc. degree in Data Analytics and Artificial Intelligence from Hong Kong Baptist University in 2022. In 2018, I received my B.Sc. degree in Computer Science and Technology from ZHIXING College of Northwest Normal University, China.
 
-## Recommended IDE Setup
+**Research Interests: Recommender Systems, Human-Computer Interaction, Software Engineering.**
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
+Our "[Positive Intelligence](https://pilab-hkbu.github.io/#/)" Lab conducts interdisciplinary research on intelligent technology for well-being.
