@@ -12,7 +12,7 @@ export const useProjectsStore= defineStore('projects',{
         projects: () => {
             return [
                 {
-                    image: "/public/img/products/elecnet-logo.png",
+                    image: "/img/products/elecnet-logo.png",
                     title: "ElecNet",
                     description: "Network Utility",
                     platforms: [
@@ -21,7 +21,7 @@ export const useProjectsStore= defineStore('projects',{
                     link: "https://apps.apple.com/app/elecnet/id6473825844"
                 },
                 {
-                    image: "/public/img/products/ai-digital-poet-logo.png",
+                    image: "/img/products/ai-digital-poet-logo.png",
                     title: "與AI古人聊古詩",
                     description: "在課堂之外沈浸式學習古詩",
                     platforms: [
@@ -30,7 +30,7 @@ export const useProjectsStore= defineStore('projects',{
                     link: "https://pilab-hkbu.github.io/AIPoets/"
                 },
                 {
-                    image: "/public/img/products/wofoo-health-logo.png",
+                    image: "/img/products/wofoo-health-logo.png",
                     title: "和富健康",
                     description: "您的掌上健康助手",
                     platforms: [
