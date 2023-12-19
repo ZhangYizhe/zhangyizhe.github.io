@@ -38,6 +38,24 @@ export const useProjectsStore= defineStore('projects',{
                         "Android",
                     ],
                     link: "https://health.elecoxy.com"
+                },
+                {
+                    image: "/img/products/pistis-health.png",
+                    title: "Pistis Health",
+                    description: "A Centralized Platform for Collecting and Personalizing Information about Mental Health Services to the Public",
+                    platforms: [
+                        "Web",
+                    ],
+                    link: "https://pilab-hkbu.github.io/#/projects/project?pid=2"
+                },
+                {
+                    image: "/img/products/feng.png",
+                    title: "Feng.com",
+                    description: "Technology media and geek communication community",
+                    platforms: [
+                        "iOS",
+                    ],
+                    link: "https://apps.apple.com/hk/app/%E5%A8%81%E9%94%8B-%E7%A7%91%E6%8A%80%E6%96%B0%E9%97%BB-%E6%9E%9C%E7%B2%89%E4%BA%92%E5%8A%A8%E4%BA%A4%E6%B5%81%E7%A4%BE%E5%8C%BA/id1411932809?l=en-GB"
                 }
             ]
         },

@@ -32,12 +32,12 @@ onMounted(() => {
               Contact me</p></a>
           </div>
           <div class="column is-full" style="margin: 5px 0 5px 0">
-            <a :href="user.github" target="_blank" style="color: #4a4a4a"><p><i class="bi bi-github"></i>
-              Github</p></a>
+            <a :href="user.linkedin" target="_blank" style="color: #4a4a4a"><p><i class="bi bi-browser-safari"></i>
+              Linkedin</p></a>
           </div>
           <div class="column is-full" style="margin: 5px 0 5px 0">
-            <a :href="user.website" target="_blank" style="color: #4a4a4a"><p><i class="bi bi-browser-safari"></i>
-              Website</p></a>
+            <a :href="user.github" target="_blank" style="color: #4a4a4a"><p><i class="bi bi-github"></i>
+              Github</p></a>
           </div>
           <div class="column is-full" style="margin: 5px 0 5px 0">
             <p style="color: #4a4a4a"><i class="bi bi-geo-alt-fill"></i> {{ user.location }}</p>

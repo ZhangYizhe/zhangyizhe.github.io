@@ -26,7 +26,7 @@ function openUrl(url) {
       <div class="columns pb-6 is-multiline projects-canvas">
         <div class="column is-6 mb-4"  v-for="project in projects.projects">
           <div class="project-card" @click="openUrl(project.link)">
-            <div class="columns is-vcentered is-multiline is-mobile px-6 py-5">
+            <div class="columns is-multiline is-mobile px-6 py-5">
               <div class="column is-narrow">
                 <div class="project-image" style="overflow: clip">
                   <img :src="project.image">
@@ -95,12 +95,12 @@ function openUrl(url) {
 }
 
 .project-title {
-  font-size: max(25px, 2vw);
+  font-size: max(20px, 1.5vw);
   font-weight: bold;
 }
 
 .project-description {
-  font-size: max(20px, 1.5vw);
+  font-size: max(15px, 1.1vw);
 }
 
 .project-tag {
