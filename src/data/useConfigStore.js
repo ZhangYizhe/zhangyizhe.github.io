@@ -17,12 +17,12 @@ export const useConfigStore= defineStore('config',{
 
     getters: {
         modelVersion: () => 'gpt-4',
-        apiVersion: () => '2023-08-01-preview',
+        apiVersion: () => '2023-12-01-preview',
         languageVersion: () => {
             return {
-                grammar: '1.8.0',
-                translate: '1.3.0',
-                c2m: '1.0.0',
+                grammar: '1.9.0',
+                translate: '1.4.0',
+                c2m: '1.1.0',
             }
         },
         db: () => firebaseDB,
