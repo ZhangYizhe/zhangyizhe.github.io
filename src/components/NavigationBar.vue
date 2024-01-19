@@ -34,6 +34,9 @@ const isExpended = computed(() => config.isExpended)
                         <!--            <router-link to="/" :class="['navbar-item', tag === 'projects' ? 'is-active' : '']">-->
                         <!--              Projects-->
                         <!--            </router-link>-->
+                        <router-link to="/publications" :class="['navbar-item', tag === 'publications' ? 'is-active' : '']">
+                          Publications
+                        </router-link>
                         <router-link to="/projects" :class="['navbar-item', tag === 'projects' ? 'is-active' : '']">
                           Projects
                         </router-link>
