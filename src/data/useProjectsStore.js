@@ -20,6 +20,15 @@ export const useProjectsStore= defineStore('projects',{
                     ],
                     link: "https://apps.apple.com/app/elecnet/id6473825844"
                 },
+                {
+                    image: "/img/products/tarot.png",
+                    title: "Tarot Parse",
+                    description: "Tarot parser powered by GPT",
+                    platforms: [
+                        "Web",
+                    ],
+                    link: "https://elecoxy.com/#/projects/tarot"
+                },
                 // {
                 //     image: "/img/products/ai-digital-poet-logo.png",
                 //     title: "與AI古人聊古詩",
