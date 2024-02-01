@@ -1,8 +1,14 @@
 <script setup>
-import {onMounted, reactive} from "vue";
+import {computed, onMounted, reactive} from "vue";
 import { useConfigStore } from "@/data/useConfigStore";
+import { usePublicationsStore } from "@/data/usePublicationsStore";
 
 const config = useConfigStore();
+const publicationsStore = usePublicationsStore();
+
+const publications = computed(() => {
+  return publicationsStore.publications
+})
 
 onMounted(() => {
   config.tag = 'publications';
@@ -12,7 +18,7 @@ onMounted(() => {
 
 <template>
   <div style="background: #F8FAFC">
-    <section class="container">
+    <section class="container" style="min-height: calc(100vh - 215px)">
       <p class="big-title py-6">
         Selected <span class="big-title-color">publications</span>
       </p>
@@ -21,10 +27,18 @@ onMounted(() => {
           ♱ indicates equal contributions, and * indicates the corresponding author.
         </p>
 
-        <div class="columns is-multiline">
-          <div class="column is-full">
+        <div class="columns is-multiline is-gapless">
+          <div class="column is-full my-2" v-if="publications.length === 0">
             <p>
               Waiting for update...
+            </p>
+          </div>
+          <div class="column is-full my-2" v-for="(publication, index) in publications" v-else>
+            <p>
+              {{ index + 1 }}. <span v-html="publication.title"></span>
+            </p>
+            <p>
+              <a v-for="link in publication.links" :href="link.url" target="_blank" style="color: green">[{{link.title}}] </a>
             </p>
           </div>
         </div>
