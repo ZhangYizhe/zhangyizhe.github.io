@@ -16,8 +16,18 @@ const routes = [
 
     {
         path: '/projects',
-        name: 'projects',
-        component: () => import('@/components/Projects/ProjectsView.vue'),
+        children: [
+            {
+                path: '',
+                name: 'projects',
+                component: () => import('@/components/Projects/ProjectsView.vue'),
+            },
+            {
+                path: 'tarot',
+                name: 'projects-tarot',
+                component: () => import('@/components/Projects/Tarot/TarotView.vue'),
+            }
+        ]
     },
 
 

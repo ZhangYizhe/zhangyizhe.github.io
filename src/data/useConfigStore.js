@@ -16,13 +16,13 @@ export const useConfigStore= defineStore('config',{
     },
 
     getters: {
-        modelVersion: () => 'gpt-4',
+        modelVersion: () => 'gpt-4-turbo',
         apiVersion: () => '2023-12-01-preview',
         languageVersion: () => {
             return {
-                grammar: '1.9.0',
-                translate: '1.4.0',
-                c2m: '1.1.0',
+                grammar: '2.0.0',
+                translate: '1.5.0',
+                c2m: '1.2.0',
             }
         },
         db: () => firebaseDB,
