@@ -127,7 +127,7 @@ function cleanAll() {
 </script>
 
 <template>
-  <div class="container">
+  <div class="container" style="min-height: calc(100vh - 215px)">
     <p class="big-title py-3">
       <span class="big-title-color">Tarot Parse</span>
     </p>

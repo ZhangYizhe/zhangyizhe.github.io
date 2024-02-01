@@ -152,98 +152,100 @@ onMounted(() => {
 </script>
 
 <template>
-  <div style="background-color: #fafafa; padding-bottom: 35px">
-    <div class="container py-3 px-3">
-      <div class="buttons">
-        <button :class="['button', functionType === 'grammar' ? 'is-link' : '']" style="font-size: 0.8rem; font-weight: bold"
-                @click="functionType = 'grammar'"><i class="bi bi-spellcheck"
-                                             style="margin-right: 5px; font-size: 1rem"></i>Grammar
-          ( {{ config.languageVersion.grammar }} )
-        </button>
-        <button :class="['button', functionType === 'translate' ? 'is-link' : '']" style="font-size: 0.8rem; font-weight: bold"
-                @click="functionType = 'translate'"><i class="bi bi-spellcheck"
-                                              style="margin-right: 5px; font-size: 1rem"></i>Translate
-          ( {{ config.languageVersion.translate }} )
-        </button>
-        <button :class="['button', functionType === 'c2m' ? 'is-link' : '']" style="font-size: 0.8rem; font-weight: bold"
-                @click="functionType = 'c2m'"><i class="bi bi-spellcheck"
-                                                       style="margin-right: 5px; font-size: 1rem"></i>粵轉書面
-          ( {{ config.languageVersion.c2m }} )
-        </button>
-      </div>
-    </div>
-  </div>
-  <div class="container canvas mb-5" style="margin-top: -30px; background-color: white">
-    <div class="columns is-multiline m-0">
-      <div class="column">
-        <div class="columns is-multiline">
-          <div class="column is-full">
-            <div class="columns is-mobile">
-              <div class="column is-narrow" style="border-bottom: 3px solid #485fc7">
-                <span class="main-color" style="font-weight: bold;">DETECT LANGUAGE</span>
-              </div>
-            </div>
-          </div>
-          <div class="column is-full p-5"
-               style="border-top: 1px solid #cbcbcb; border-right: 1px solid #cbcbcb">
-            <textarea v-model="inputs.left" placeholder="Input" ref="leftInputRef"
-                      :disabled="isLoading"></textarea>
-          </div>
-          <div class="column is-full has-text-right"
-               style="border-top: 1px solid #cbcbcb;border-bottom: 1px solid #cbcbcb; border-right: 1px solid #cbcbcb; margin-bottom: -1px">
-            <button class="button is-danger is-outlined"
-                    style="font-size: 0.8rem; font-weight: bold; margin-right: 10px" @click="cleanBtnTap">
-              <i class="bi bi-trash3" style="margin-right: 5px; font-size: 1rem"></i>
-              Clean
-            </button>
-            <button class="button is-link is-outlined" style="font-size: 0.8rem; font-weight: bold;"
-                    :disabled="isLoading" @click="request">
-              <template v-if="isLoading === false">
-                <i class="bi bi-spellcheck" style="margin-right: 5px; font-size: 1rem"></i>
-              </template>
-              <template v-else>
-                <div class="loader-wrapper is-active"
-                     style="margin-right: 5px; font-size: 1rem; color: #485fc7">
-                  <div class="loader is-loading"></div>
-                </div>
-              </template>
-              <template v-if="functionType === 'grammar'">
-                Grammar
-              </template>
-              <template v-else-if="functionType === 'translate'">
-                Translate
-              </template>
-              <template v-else>
-                粵轉書面
-              </template>
-            </button>
-          </div>
+  <div style="min-height: calc(100vh - 240px)">
+    <div style="background-color: #fafafa; padding-bottom: 35px">
+      <div class="container py-3 px-3">
+        <div class="buttons">
+          <button :class="['button', functionType === 'grammar' ? 'is-link' : '']" style="font-size: 0.8rem; font-weight: bold"
+                  @click="functionType = 'grammar'"><i class="bi bi-spellcheck"
+                                                       style="margin-right: 5px; font-size: 1rem"></i>Grammar
+            ( {{ config.languageVersion.grammar }} )
+          </button>
+          <button :class="['button', functionType === 'translate' ? 'is-link' : '']" style="font-size: 0.8rem; font-weight: bold"
+                  @click="functionType = 'translate'"><i class="bi bi-spellcheck"
+                                                         style="margin-right: 5px; font-size: 1rem"></i>Translate
+            ( {{ config.languageVersion.translate }} )
+          </button>
+          <button :class="['button', functionType === 'c2m' ? 'is-link' : '']" style="font-size: 0.8rem; font-weight: bold"
+                  @click="functionType = 'c2m'"><i class="bi bi-spellcheck"
+                                                   style="margin-right: 5px; font-size: 1rem"></i>粵轉書面
+            ( {{ config.languageVersion.c2m }} )
+          </button>
         </div>
       </div>
-      <div class="column">
-        <div class="columns is-multiline">
-          <div class="column is-full">
-            <div class="columns is-mobile">
-              <div class="column is-narrow" style="border-bottom: 3px solid #485fc7">
-                <span class="main-color" style="font-weight: bold;">RESULT</span>
+    </div>
+    <div class="container canvas mb-5" style="margin-top: -30px; background-color: white">
+      <div class="columns is-multiline m-0">
+        <div class="column">
+          <div class="columns is-multiline">
+            <div class="column is-full">
+              <div class="columns is-mobile">
+                <div class="column is-narrow" style="border-bottom: 3px solid #485fc7">
+                  <span class="main-color" style="font-weight: bold;">DETECT LANGUAGE</span>
+                </div>
               </div>
             </div>
+            <div class="column is-full p-5"
+                 style="border-top: 1px solid #cbcbcb; border-right: 1px solid #cbcbcb">
+            <textarea v-model="inputs.left" placeholder="Input" ref="leftInputRef"
+                      :disabled="isLoading"></textarea>
+            </div>
+            <div class="column is-full has-text-right"
+                 style="border-top: 1px solid #cbcbcb;border-bottom: 1px solid #cbcbcb; border-right: 1px solid #cbcbcb; margin-bottom: -1px">
+              <button class="button is-danger is-outlined"
+                      style="font-size: 0.8rem; font-weight: bold; margin-right: 10px" @click="cleanBtnTap">
+                <i class="bi bi-trash3" style="margin-right: 5px; font-size: 1rem"></i>
+                Clean
+              </button>
+              <button class="button is-link is-outlined" style="font-size: 0.8rem; font-weight: bold;"
+                      :disabled="isLoading" @click="request">
+                <template v-if="isLoading === false">
+                  <i class="bi bi-spellcheck" style="margin-right: 5px; font-size: 1rem"></i>
+                </template>
+                <template v-else>
+                  <div class="loader-wrapper is-active"
+                       style="margin-right: 5px; font-size: 1rem; color: #485fc7">
+                    <div class="loader is-loading"></div>
+                  </div>
+                </template>
+                <template v-if="functionType === 'grammar'">
+                  Grammar
+                </template>
+                <template v-else-if="functionType === 'translate'">
+                  Translate
+                </template>
+                <template v-else>
+                  粵轉書面
+                </template>
+              </button>
+            </div>
           </div>
-          <div class="column is-full p-5" style="border-top: 1px solid #cbcbcb;">
-            <textarea v-model="inputs.right" placeholder="Output" ref="rightInputRef"></textarea>
-          </div>
-          <div class="column is-full has-text-right"
-               style="border-top: 1px solid #cbcbcb;border-bottom: 1px solid #cbcbcb; border-right: 1px solid #cbcbcb; margin-bottom: -1px">
-            <button class="button is-link is-outlined mr-2" style="font-size: 0.8rem; font-weight: bold;"
-                    @click="translateBtnTap">
-              <i class="bi bi-translate" style="margin-right: 5px; font-size: 1rem"></i>
-              Google translate
-            </button>
-            <button class="button is-link is-outlined" style="font-size: 0.8rem; font-weight: bold;"
-                    @click="copyBtnTap">
-              <i class="bi bi-clipboard" style="margin-right: 5px; font-size: 1rem"></i>
-              {{ copyBtnStr }}
-            </button>
+        </div>
+        <div class="column">
+          <div class="columns is-multiline">
+            <div class="column is-full">
+              <div class="columns is-mobile">
+                <div class="column is-narrow" style="border-bottom: 3px solid #485fc7">
+                  <span class="main-color" style="font-weight: bold;">RESULT</span>
+                </div>
+              </div>
+            </div>
+            <div class="column is-full p-5" style="border-top: 1px solid #cbcbcb;">
+              <textarea v-model="inputs.right" placeholder="Output" ref="rightInputRef"></textarea>
+            </div>
+            <div class="column is-full has-text-right"
+                 style="border-top: 1px solid #cbcbcb;border-bottom: 1px solid #cbcbcb; border-right: 1px solid #cbcbcb; margin-bottom: -1px">
+              <button class="button is-link is-outlined mr-2" style="font-size: 0.8rem; font-weight: bold;"
+                      @click="translateBtnTap">
+                <i class="bi bi-translate" style="margin-right: 5px; font-size: 1rem"></i>
+                Google translate
+              </button>
+              <button class="button is-link is-outlined" style="font-size: 0.8rem; font-weight: bold;"
+                      @click="copyBtnTap">
+                <i class="bi bi-clipboard" style="margin-right: 5px; font-size: 1rem"></i>
+                {{ copyBtnStr }}
+              </button>
+            </div>
           </div>
         </div>
       </div>
