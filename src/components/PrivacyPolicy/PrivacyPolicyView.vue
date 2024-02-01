@@ -7,6 +7,13 @@
 <script>
 import {marked} from 'marked'
 import {markedHighlight} from "marked-highlight";
+import {mangle} from "marked-mangle";
+import { gfmHeadingId } from "marked-gfm-heading-id";
+
+marked.use(mangle());
+marked.use(gfmHeadingId({
+  prefix: "my-prefix-",
+}));
 
 marked.use(markedHighlight({
     langPrefix: 'hljs language-',
