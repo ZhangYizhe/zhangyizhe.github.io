@@ -13,6 +13,7 @@
     "firebase": "^10.7.2",
     "github-markdown-css": "^5.5.0",
     "js-base64": "^3.7.6",
+    "marked": "^11.2.0",
     "marked-gfm-heading-id": "^3.1.2",
     "marked-highlight": "^2.1.0",
     "marked-mangle": "^1.1.6",
