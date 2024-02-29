@@ -24,7 +24,7 @@ onMounted(() => {
       </p>
       <div class="publications-canvas pb-3">
         <p class="notation-content pb-2">
-          ♱ indicates equal contributions, and * indicates the corresponding author.
+          + indicates equal contributions, and * indicates the corresponding author.
         </p>
 
         <div class="columns is-multiline is-gapless">
@@ -38,7 +38,7 @@ onMounted(() => {
               {{ index + 1 }}. <span v-html="publication.title"></span>
             </p>
             <p>
-              <a v-for="link in publication.links" :href="link.url" target="_blank" style="color: green">[{{link.title}}] </a>
+              <a v-for="link in publication.links" :href="link.link" target="_blank" style="color: green">[{{link.title}}] </a>
             </p>
           </div>
         </div>
