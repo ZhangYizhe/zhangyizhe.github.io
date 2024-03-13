@@ -29,15 +29,15 @@ export const useProjectsStore= defineStore('projects',{
                     ],
                     link: "https://elecoxy.com/#/projects/tarot"
                 },
-                // {
-                //     image: "/img/products/ai-digital-poet-logo.png",
-                //     title: "與AI古人聊古詩",
-                //     description: "在課堂之外沈浸式學習古詩",
-                //     platforms: [
-                //         "iOS",
-                //     ],
-                //     link: "https://pilab-hkbu.github.io/AIPoets/"
-                // },
+                {
+                    image: "/img/products/ai-digital-poet-logo.png",
+                    title: "與AI古人聊古詩",
+                    description: "在課堂之外沈浸式學習古詩",
+                    platforms: [
+                        "iOS",
+                    ],
+                    link: "https://pilab-hkbu.github.io/#/projects/project?pid=9"
+                },
                 {
                     image: "/img/products/wofoo-health-logo.png",
                     title: "和富健康",
