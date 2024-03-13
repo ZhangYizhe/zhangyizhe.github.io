@@ -39,9 +39,6 @@ onMounted(() => {
             <a :href="user.github" target="_blank" style="color: #4a4a4a"><p><i class="bi bi-github"></i>
               Github</p></a>
           </div>
-          <div class="column is-full" style="margin: 5px 0 5px 0">
-            <p style="color: #4a4a4a"><i class="bi bi-geo-alt-fill"></i> {{ user.location }}</p>
-          </div>
 
           <div class="column is-full" style="margin: 5px 0 5px 0">
             <a :href="user.google" target="_blank" style="color: #4a4a4a"><p><i class="bi bi-google"></i>
@@ -63,6 +60,11 @@ onMounted(() => {
               <span>0009-0004-0224-345X</span>
             </a>
           </div>
+
+          <div class="column is-full" style="margin: 5px 0 5px 0">
+            <p style="color: #4a4a4a"><i class="bi bi-geo-alt-fill"></i> {{ user.location }}</p>
+          </div>
+
         </div>
       </div>
       <div class="column is-8">
