@@ -44,6 +44,11 @@ onMounted(() => {
           </div>
 
           <div class="column is-full" style="margin: 5px 0 5px 0">
+            <a :href="user.google" target="_blank" style="color: #4a4a4a"><p><i class="bi bi-google"></i>
+              Google Scholar</p></a>
+          </div>
+
+          <div class="column is-full" style="margin: 5px 0 5px 0">
             <a
                 id="cy-effective-orcid-url"
                 class="underline"

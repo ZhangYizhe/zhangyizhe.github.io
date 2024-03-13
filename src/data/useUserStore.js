@@ -10,6 +10,7 @@ export const useUserStore = defineStore('user',{
         website: 'https://elecoxy.com',
         github: 'https://github.com/zhangyizhe',
         linkedin: 'https://www.linkedin.com/in/zhangyizhe',
+        google: 'https://scholar.google.com/citations?hl=en&user=apwBmTYAAAAJ',
         content: {
             title: '👋 Hello , Good Day !',
             description: 'I am a Senior Research Assistant in the Department of Computer Science at Hong Kong Baptist University under the supervision of Prof. CHEN, Li. I received my M.Sc. degree in Data Analytics and Artificial Intelligence from Hong Kong Baptist University in 2022. In 2018, I received my B.Sc. degree in Computer Science and Technology from ZHIXING College of Northwest Normal University, China.<br><br>Research Interests: Conversational AI, Explainable AI, Human Computer Interaction, Recommender Systems, Software Engineering.<br><br>Our <a style="background: -webkit-linear-gradient(-90deg, #1A779D, #30E699); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" href="https://hci.comp.hkbu.edu.hk" target="_blank">"Positive Intelligence" Lab</a> conducts interdisciplinary research on intelligent technology for well-being.',
