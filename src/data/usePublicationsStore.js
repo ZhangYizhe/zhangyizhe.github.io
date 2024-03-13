@@ -12,7 +12,7 @@ export const usePublicationsStore= defineStore('publications',{
         publications: () => {
             return [
                 {
-                    title: "Jin, Y.+, Cai, W.+, Chen, L.*, <strong>Zhang, Y.</strong>, Doherty, G., & Jiang, T. (2024). Exploring Generative AI for Music-based Reminiscence with Older Adults. In <i>CHI Conference on Human Factors in Computing Systems (CHI '24)</i>.",
+                    title: "Jin, Y.+, Cai, W.+, Chen, L.*, <strong>Zhang, Y.</strong>, Doherty, G., & Jiang, T. (2024). Exploring the Design of Generative AI in Supporting Music-based Reminiscence for Older Adults. In <i>CHI Conference on Human Factors in Computing Systems (CHI '24)</i>.",
                     links: [
                         {
                             title: "PDF",
