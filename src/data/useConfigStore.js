@@ -8,21 +8,24 @@ export const useConfigStore= defineStore('config',{
             return {
                 tag: 'home',
                 isExpended: false,
-
-                bugptURL: "https://ai.yizheyun.cn",
-
                 azureSpeech: "",
+
+                modelUrl: 'ai-poets-dalle3.openai.azure.com',
+                modelVersion: 'gpt-35-turbo',
+                apiVersion: '2024-02-15-preview',
             }
     },
 
     getters: {
-        modelVersion: () => 'gpt-35-turbo',
-        apiVersion: () => '2024-02-15-preview',
+        gptURL: (state) => {
+            return "https://ai.yizheyun.cn?model_url=" + state.modelUrl + "&model_name=" + state.modelVersion + "&api_version=" + state.apiVersion
+        },
+
         languageVersion: () => {
             return {
-                grammar: '2.1.0',
-                translate: '1.6.0',
-                c2m: '1.3.0',
+                grammar: '2.2.0',
+                translate: '1.7.0',
+                c2m: '1.4.0',
             }
         },
         db: () => firebaseDB,

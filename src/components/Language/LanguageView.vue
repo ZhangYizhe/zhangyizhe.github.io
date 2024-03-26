@@ -77,7 +77,7 @@ function request() {
     'Content-Type': 'application/json',
   };
 
-  axios.post(config.bugptURL, {
+  axios.post(config.gptURL, {
     temperature: 0,
     messages: [
       {
@@ -132,6 +132,15 @@ function copyBtnTap() {
     copyBtnStr.value = "Copy";
   })
 
+}
+
+async function pasteBtnTap() {
+  leftInputRef.value.focus();
+  inputs.left = await navigator.clipboard.readText();
+
+  nextTick(() => {
+    resizeTextarea()
+  })
 }
 
 function translateBtnTap() {
@@ -197,17 +206,14 @@ onMounted(() => {
                 <i class="bi bi-trash3" style="margin-right: 5px; font-size: 1rem"></i>
                 Clean
               </button>
-              <button class="button is-link is-outlined" style="font-size: 0.8rem; font-weight: bold;"
+              <button class="button is-warning is-outlined"
+                      style="font-size: 0.8rem; font-weight: bold; margin-right: 10px" @click="pasteBtnTap">
+                <i class="bi bi-clipboard" style="margin-right: 5px; font-size: 1rem"></i>
+                Paste
+              </button>
+              <button :class="['button is-link is-outlined', isLoading ? 'is-loading' : '']" style="font-size: 0.8rem; font-weight: bold;"
                       :disabled="isLoading" @click="request">
-                <template v-if="isLoading === false">
-                  <i class="bi bi-spellcheck" style="margin-right: 5px; font-size: 1rem"></i>
-                </template>
-                <template v-else>
-                  <div class="loader-wrapper is-active"
-                       style="margin-right: 5px; font-size: 1rem; color: #485fc7">
-                    <div class="loader is-loading"></div>
-                  </div>
-                </template>
+                <i class="bi bi-spellcheck" style="margin-right: 5px; font-size: 1rem"></i>
                 <template v-if="functionType === 'grammar'">
                   Grammar
                 </template>
