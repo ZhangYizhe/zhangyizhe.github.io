@@ -8,13 +8,12 @@ const config = useConfigStore();
 const chatStore = useChatStore();
 
 const inputTextareaRef = ref(null)
-const inputText = ref("")
 
 
 // Message
 function sendBtnTap(e) {
 
-  const textTrim = inputText.value.trim();
+  const textTrim = chatStore.message.trim();
 
   if (textTrim === '') {
     return;
@@ -22,7 +21,7 @@ function sendBtnTap(e) {
 
   addNewMessage(textTrim);
 
-  inputText.value = "";
+  chatStore.message = "";
 
   chatStore.requestMessage();
 }
@@ -75,7 +74,7 @@ watch(chatStore.messages, async (newValue, oldValue) => {
   scrollToBottom();
 })
 
-watch(inputText, async (newValue, oldValue) => {
+watch(chatStore.message, async (newValue, oldValue) => {
   await nextTick(() => {
     resizeTextarea()
   })
@@ -153,7 +152,7 @@ onMounted(() => {
         </button>
       </div>
       <div class="column">
-        <textarea v-model="inputText" placeholder="說點什麼吧" ref="inputTextareaRef" @keyup.enter="chatStore.allowEnterToSend ? sendBtnTap() : null"
+        <textarea v-model="chatStore.message" placeholder="說點什麼吧" ref="inputTextareaRef" @keyup.enter="chatStore.allowEnterToSend ? sendBtnTap() : null"
                   :disabled="chatStore.isLoading"></textarea>
       </div>
       <div class="column is-narrow" style="margin: 0 0 0 5px">

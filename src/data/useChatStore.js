@@ -15,12 +15,13 @@ export const useChatStore= defineStore('chat',{
                 content: "",
             },
 
+            message: '',
             messages: []
         }
     },
     persist: {
         storage: localStorage,
-        paths: ['messages', 'systemMessage', 'allowEnterToSend'],
+        paths: ['message', 'messages', 'systemMessage', 'allowEnterToSend'],
     },
 
     getters: {
