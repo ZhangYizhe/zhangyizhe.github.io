@@ -7,6 +7,9 @@ export const useChatStore= defineStore('chat',{
         return {
             isLoading: false,
 
+            showSetting: false,
+            allowEnterToSend: true,
+
             systemMessage: {
                 role: "system",
                 content: "",
@@ -17,7 +20,7 @@ export const useChatStore= defineStore('chat',{
     },
     persist: {
         storage: localStorage,
-        paths: ['messages'],
+        paths: ['messages', 'systemMessage', 'allowEnterToSend'],
     },
 
     getters: {

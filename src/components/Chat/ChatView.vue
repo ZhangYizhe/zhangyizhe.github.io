@@ -28,8 +28,10 @@ function sendBtnTap(e) {
 }
 
 function reComposeBtnTap(index) {
-  chatStore.messages = chatStore.messages.slice(0, index + 1);
-  chatStore.requestMessage();
+  if (confirm('Are you sure you want to regenerate from here?')) {
+    chatStore.messages = chatStore.messages.slice(0, index + 1);
+    chatStore.requestMessage();
+  }
 }
 
 function addNewMessage(content) {
@@ -90,28 +92,6 @@ onMounted(() => {
 <template>
   <div class="canvas" ref="mainCanvasRef">
     <div class="columns is-multiline m-0">
-      <div :class="['column is-full cal-basic', 'cal-assistant' ]">
-        <div class="container is-max-desktop">
-          <div class="columns is-multiline">
-            <div class="column">
-              <div class="columns is-mobile">
-                <div class="column is-narrow">
-                  <img src="/public/img/chat/robot.png" class="shadow-sm"
-                       style="width: 45px; height: 45px; border-radius: 4px; margin-right: 10px; background-color: white; padding: 2px"
-                       alt="">
-                </div>
-                <div class="column" style="margin-right: 15px">
-                  <div class="columns is-multiline is-mobile">
-                    <h1 class="column is-full" style="padding-left: 0; font-weight: bold">聊天機器人特性</h1>
-                    <textarea class="column systemMessage" v-model="chatStore.systemMessage.content" placeholder="請輸入聊天機器人的特性。"></textarea>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <template v-for="(message, index) in chatStore.messages">
         <div v-if="message.role !== 'system'"
              :class="['column is-full cal-basic', message.role === 'user' ? 'cal-user' : 'cal-assistant' ]">
@@ -168,35 +148,66 @@ onMounted(() => {
 
   <div :class="['inputView', (chatStore.isLoading) ? 'inputView-disabled' : '']">
     <div class="columns is-gapless is-mobile">
+      <div class="column is-narrow" style="margin: 0 0 0 0">
+        <button type="button" :class="['button is-white']" @click="chatStore.showSetting =  true"><i class="bi bi-gear"></i>
+        </button>
+      </div>
       <div class="column">
-      <textarea v-model="inputText" placeholder="說點什麼吧" ref="inputTextareaRef"
-                :disabled="chatStore.isLoading"></textarea>
-
-        <!--  @keyup.enter.exact="sendBtnTap"-->
+        <textarea v-model="inputText" placeholder="說點什麼吧" ref="inputTextareaRef" @keyup.enter="chatStore.allowEnterToSend ? sendBtnTap() : null"
+                  :disabled="chatStore.isLoading"></textarea>
       </div>
       <div class="column is-narrow" style="margin: 0 0 0 5px">
         <button type="button" :class="['button is-white', chatStore.isLoading ? 'is-loading': '']" @click="sendBtnTap" :disabled="chatStore.isLoading"><i class="bi bi-send"></i>
         </button>
-        <button type="button" :class="['button is-white', chatStore.isLoading ? 'is-loading': '']" @click="resetBtnTap" :disabled="chatStore.isLoading"><i
-            class="bi bi-arrow-clockwise"></i>
+        <button type="button" :class="['button is-white', chatStore.isLoading ? 'is-loading': '']" @click="resetBtnTap" :disabled="chatStore.isLoading"><i class="bi bi-trash3"></i>
         </button>
       </div>
     </div>
   </div>
 
-  <div class="modal is-active">
+  <div :class="['modal', chatStore.showSetting ? 'is-active' : '' ]">
     <div class="modal-background"></div>
     <div class="modal-card">
       <header class="modal-card-head">
         <p class="modal-card-title">Setting</p>
-        <button class="delete" aria-label="close"></button>
+        <button class="delete" aria-label="close"  @click="chatStore.showSetting = false"></button>
       </header>
       <section class="modal-card-body">
-        <!-- Content ... -->
+        <div class="columns is-multiline is-mobile">
+
+          <div class="column is-full">
+            <p class="title is-5">
+              System Prompt (Optional)
+            </p>
+            <textarea class="column systemMessage" style="height: 150px" v-model="chatStore.systemMessage.content" placeholder="Please enter the System Prompt."></textarea>
+          </div>
+
+          <div class="column is-full">
+            <div class="field is-horizontal">
+              <div class="field-label">
+                <label class="label" style="width: 200px">Use 'Enter' key for send</label>
+              </div>
+              <div class="field-body">
+                <div class="field is-narrow">
+                  <div class="control">
+                    <label class="radio mr-3">
+                      <input type="radio" :value="true" v-model="chatStore.allowEnterToSend">
+                      Allow
+                    </label>
+                    <label class="radio">
+                      <input type="radio" :value="false" v-model="chatStore.allowEnterToSend">
+                      Deny
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
       <footer class="modal-card-foot">
         <div class="buttons">
-          <button class="button is-success">Back</button>
+          <button class="button is-success" @click="chatStore.showSetting = false">Back</button>
         </div>
       </footer>
     </div>
@@ -231,12 +242,12 @@ onMounted(() => {
 }
 
 .cal-user {
-  background-color: white;
+  background-color: #F4F6F9;
   border-bottom: 1px solid #e3e3e3;
 }
 
 .cal-assistant {
-  background-color: #F4F6F9;
+  background-color: white;
   border-bottom: 1px solid #e3e3e3;
 }
 
