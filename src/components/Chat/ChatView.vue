@@ -2,104 +2,43 @@
 import { useConfigStore } from "@/data/useConfigStore";
 import {nextTick, onMounted, ref, watch} from "vue";
 import axios from "axios";
+import {useChatStore} from "@/data/useChatStore.js";
 
 const config = useConfigStore();
-
-const systemMessages = ref({
-  role: "system",
-  content: "",
-})
-
-const recordsNum = ref(20)
-
-const tempMessage = ref("")
-const messages = ref([])
+const chatStore = useChatStore();
 
 const inputTextareaRef = ref(null)
 const inputText = ref("")
 
-const isLoading = ref(false)
 
 // Message
 function sendBtnTap(e) {
 
   const textTrim = inputText.value.trim();
 
-  if (textTrim === '' || config.gptKey === '') {
+  if (textTrim === '') {
     return;
   }
 
-  addNewMessage({
-    "role": "user",
-    "content": textTrim.replaceAll("\n", "<br />")
-  })
-
-  scrollToBottom();
+  addNewMessage(textTrim);
 
   inputText.value = "";
 
-  request();
+  chatStore.requestMessage();
 }
 
 function reComposeBtnTap(index) {
-  messages.value = messages.value.slice(0, index);
-
-  scrollToBottom();
-
-  request();
-}
-
-async function request() {
-
-  isLoading.value = true;
-
-  axios.post(
-      config.gptURL,
-      {
-        messages: systemMessages.value.content === '' ? messages.value : [systemMessages.value, ...messages.value],
-        temperature: 0
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      }
-      )
-      .then(function (response) {
-        try {
-          isLoading.value = false;
-
-          const data = response.data;
-          if (data.error !== undefined) {
-            alert(data.error.message);
-            return;
-          }
-          const message = data.choices[0].message;
-          messages.value.push(message);
-
-          scrollToBottom();
-        } catch (e) {
-          alert(e)
-        }
-      })
-      .catch(function (error) {
-        isLoading.value = false;
-        alert(error);
-      })
+  chatStore.messages = chatStore.messages.slice(0, index + 1);
+  chatStore.requestMessage();
 }
 
 function addNewMessage(content) {
-  if (recordsNum.value > 50) {
-    alert('對話輪次數太大！')
-    return;
+  const message = {
+    "role": "user",
+    "content": content.replaceAll("\n", "<br />")
   }
 
-  if (messages.value.length > (recordsNum.value * 2)) {
-    alert('已達到最大對話輪次。');
-    return;
-  }
-
-  messages.value.push(content)
+  chatStore.messages.push(message)
 }
 
 // Textarea
@@ -117,15 +56,8 @@ function resizeTextarea() {
 
 function resetBtnTap() {
   if (confirm('Are you sure to clean?')) {
-    resetConversation()
+    chatStore.cleanAll();
   }
-}
-
-function resetConversation() {
-  messages.value = []
-  inputText.value = ''
-
-  resizeTextarea()
 }
 
 // Canvas Scroll
@@ -137,12 +69,9 @@ function scrollToBottom() {
   })
 }
 
-function scrollToBottomWithoutTimer() {
-  nextTick(() => {
-    const el = mainCanvasRef.value;
-    el.scrollTop = el.scrollHeight;
-  })
-}
+watch(chatStore.messages, async (newValue, oldValue) => {
+  scrollToBottom();
+})
 
 watch(inputText, async (newValue, oldValue) => {
   await nextTick(() => {
@@ -153,7 +82,7 @@ watch(inputText, async (newValue, oldValue) => {
 onMounted(() => {
   config.tag = 'chat';
 
-  resetConversation();
+  resizeTextarea();
 })
 
 </script>
@@ -161,7 +90,7 @@ onMounted(() => {
 <template>
   <div class="canvas" ref="mainCanvasRef">
     <div class="columns is-multiline m-0">
-      <div :class="['column is-full cal-basic', systemMessages.role === 'user' ? 'cal-user' : 'cal-assistant' ]">
+      <div :class="['column is-full cal-basic', 'cal-assistant' ]">
         <div class="container is-max-desktop">
           <div class="columns is-multiline">
             <div class="column">
@@ -174,11 +103,7 @@ onMounted(() => {
                 <div class="column" style="margin-right: 15px">
                   <div class="columns is-multiline is-mobile">
                     <h1 class="column is-full" style="padding-left: 0; font-weight: bold">聊天機器人特性</h1>
-                    <textarea class="column systemMessage" v-model="systemMessages.content" placeholder="請輸入聊天機器人的特性。"></textarea>
-                  </div>
-                  <div class="columns is-multiline is-mobile">
-                    <h1 class="column is-full" style="padding-left: 0; font-weight: bold">當前可記住對話輪次數（一次問答為一輪, 請不要超過50輪）</h1>
-                    <input class="column systemMessage" v-model="recordsNum" placeholder="請輸入雙數。" type="number">
+                    <textarea class="column systemMessage" v-model="chatStore.systemMessage.content" placeholder="請輸入聊天機器人的特性。"></textarea>
                   </div>
                 </div>
               </div>
@@ -187,7 +112,7 @@ onMounted(() => {
         </div>
       </div>
 
-      <template v-for="(message, index) in messages">
+      <template v-for="(message, index) in chatStore.messages">
         <div v-if="message.role !== 'system'"
              :class="['column is-full cal-basic', message.role === 'user' ? 'cal-user' : 'cal-assistant' ]">
           <div class="container is-max-desktop">
@@ -208,17 +133,17 @@ onMounted(() => {
                   </div>
                 </div>
               </div>
-              <div class="column is-narrow" v-if="message.role === 'assistant'">
-                <div style="padding: 4px; border: 1px solid lightgrey; border-radius: 4px; cursor: pointer" @click="reComposeBtnTap(index)">
+              <div class="column is-narrow" v-if="message.role === 'user' && !chatStore.isLoading">
+                <button :class="['button is-white', chatStore.isLoading ? 'is-loading': '']"  @click="reComposeBtnTap(index)" :disabled="chatStore.isLoading">
                   <i class="bi bi-arrow-clockwise"></i>
-                </div>
+                </button>
               </div>
             </div>
           </div>
         </div>
       </template>
 
-      <div class="column is-full cal-basic cal-assistant" v-if="isLoading">
+      <div class="column is-full cal-basic cal-assistant" v-if="chatStore.isLoading">
         <div class="container is-max-desktop">
           <div class="columns is-multiline">
             <div class="column">
@@ -229,10 +154,7 @@ onMounted(() => {
                        alt="">
                 </div>
                 <div class="column message">
-                  <span v-html="tempMessage">
-
-                  </span>
-                  <span class='blinking-cursor'>▋</span>
+                  <div class="loader mt-4"></div>
                 </div>
               </div>
             </div>
@@ -244,25 +166,41 @@ onMounted(() => {
     </div>
   </div>
 
-<!--  <template v-if="config.gptKey !== ''">-->
-    <div :class="['inputView', (isLoading || config.gptKey === '') ? 'inputView-disabled' : '']">
-      <div class="columns is-gapless is-mobile">
-        <div class="column">
-        <textarea v-model="inputText" placeholder="說點什麼吧" ref="inputTextareaRef"
-                  :disabled="isLoading || config.gptKey === ''"></textarea>
+  <div :class="['inputView', (chatStore.isLoading) ? 'inputView-disabled' : '']">
+    <div class="columns is-gapless is-mobile">
+      <div class="column">
+      <textarea v-model="inputText" placeholder="說點什麼吧" ref="inputTextareaRef"
+                :disabled="chatStore.isLoading"></textarea>
 
-          <!--  @keyup.enter.exact="sendBtnTap"-->
-        </div>
-        <div class="column is-narrow" style="margin: 0 0 0 5px">
-          <button type="button" class="button" @click="sendBtnTap" :disabled="isLoading || config.gptKey === ''"><i class="bi bi-send"></i>
-          </button>
-          <button type="button" class="button" @click="resetBtnTap" :disabled="isLoading || config.gptKey === ''"><i
-              class="bi bi-arrow-clockwise"></i>
-          </button>
-        </div>
+        <!--  @keyup.enter.exact="sendBtnTap"-->
+      </div>
+      <div class="column is-narrow" style="margin: 0 0 0 5px">
+        <button type="button" :class="['button is-white', chatStore.isLoading ? 'is-loading': '']" @click="sendBtnTap" :disabled="chatStore.isLoading"><i class="bi bi-send"></i>
+        </button>
+        <button type="button" :class="['button is-white', chatStore.isLoading ? 'is-loading': '']" @click="resetBtnTap" :disabled="chatStore.isLoading"><i
+            class="bi bi-arrow-clockwise"></i>
+        </button>
       </div>
     </div>
-<!--  </template>-->
+  </div>
+
+  <div class="modal is-active">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Setting</p>
+        <button class="delete" aria-label="close"></button>
+      </header>
+      <section class="modal-card-body">
+        <!-- Content ... -->
+      </section>
+      <footer class="modal-card-foot">
+        <div class="buttons">
+          <button class="button is-success">Back</button>
+        </div>
+      </footer>
+    </div>
+  </div>
 
 </template>
 

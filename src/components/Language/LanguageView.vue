@@ -315,12 +315,4 @@ textarea:focus {
   }
 }
 
-.is-loading {
-  border: 2px solid #485fc7;
-  border-right-color: transparent;
-  border-top-color: transparent;
-  margin-top: auto;
-  margin-bottom: auto;
-}
-
 </style>
